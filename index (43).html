@@ -1,0 +1,2539 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="blue" data-light="0">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JOD VPN</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07101c;--surface:#101a2c;--surface2:#182538;--fg:#e8eef8;--muted:#93a4bd;--primary:#3b82f6;--primary-fg:#fff;--accent:#f5b942;--border:#24344d;--danger:#ef4444;--ok:#22c55e;--radius:1.1rem}
+html[data-theme="purple"]{--bg:#120818;--surface:#1c102c;--surface2:#27163c;--fg:#f3eaff;--muted:#b7a3cc;--primary:#8b5cf6;--border:#3a2454}
+html[data-theme="black"]{--bg:#090909;--surface:#141414;--surface2:#1e1e1e;--fg:#f5f5f5;--muted:#a3a3a3;--primary:#e5e5e5;--primary-fg:#111;--border:#2a2a2a}
+html[data-theme="gray"]{--bg:#1a1c20;--surface:#24272d;--surface2:#2e323a;--fg:#eceff3;--muted:#9aa3b2;--primary:#8b95a7;--primary-fg:#111;--border:#3a404c}
+html[data-theme="white"],html[data-light="1"]{--bg:#eef3f9;--surface:#fff;--surface2:#f6f8fc;--fg:#0f172a;--muted:#526178;--border:#d5deea;--primary-fg:#fff}
+html[data-theme="white"]{--primary:#2563eb}
+
+/* Glass: blur only, colors from theme */
+html[data-glass="1"] .card,
+html[data-glass="1"] .drawer,
+html[data-glass="1"] .modal,
+html[data-glass="1"] .nav,
+html[data-glass="1"] .topbar,
+html[data-glass="1"] .plan-row,
+html[data-glass="1"] .game-card,
+html[data-glass="1"] .case-tile,
+html[data-glass="1"] .modal-bg .modal{
+  backdrop-filter:blur(24px) saturate(150%);
+  -webkit-backdrop-filter:blur(24px) saturate(150%);
+  background:color-mix(in srgb, var(--surface) 72%, transparent) !important;
+  border:1px solid color-mix(in srgb, var(--border) 80%, transparent) !important;
+  box-shadow:0 8px 28px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.08);
+}
+html[data-glass="1"] input,
+html[data-glass="1"] select,
+html[data-glass="1"] textarea{
+  background:color-mix(in srgb, var(--surface2) 80%, transparent) !important;
+}
+html[data-glass="1"] body{
+  background:
+    radial-gradient(800px 420px at 15% -5%, color-mix(in srgb, var(--primary) 28%, transparent), transparent 55%),
+    radial-gradient(600px 360px at 100% 10%, color-mix(in srgb, var(--primary) 18%, transparent), transparent 50%),
+    var(--bg) !important;
+  background-attachment:fixed;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes softPop{0%{transform:scale(.94);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.card{animation:fadeUp .35s ease both}
+.game-card{animation:softPop .4s ease both}
+.avatar-img{
+  width:56px;height:56px;border-radius:16px;object-fit:cover;
+  box-shadow:0 4px 16px rgba(0,0,0,.3);
+  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+}
+.hero-photo{
+  width:100%;height:120px;border-radius:18px;object-fit:cover;
+  margin-bottom:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  background:linear-gradient(135deg,#1e3a8a,#7c3aed 50%,#0ea5e9);
+}
+.ai-bubble{border-left:3px solid #22d3ee !important}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:Manrope,system-ui,sans-serif;background:var(--bg);color:var(--fg);-webkit-tap-highlight-color:transparent}
+button,[role=button]{cursor:pointer;font:inherit}
+button:disabled{opacity:.4;cursor:not-allowed}
+input,textarea,select{font:inherit;color:var(--fg);background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;width:100%;outline:none}
+a{color:var(--primary)}
+.app{max-width:440px;margin:0 auto;min-height:100%;position:relative}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 16px;border:none;border-radius:12px;font-weight:800;font-size:14px;background:var(--primary);color:var(--primary-fg)}
+.btn.ghost{background:var(--surface2);color:var(--fg);border:1px solid var(--border)}
+.btn.danger{background:var(--danger);color:#fff}
+.btn.accent{background:var(--accent);color:#111}
+.btn.block{width:100%}
+.muted{color:var(--muted);font-size:13px}
+.row{display:flex;gap:8px;align-items:center}
+.wrap{flex-wrap:wrap}
+.grow{flex:1;min-width:0}
+.hidden{display:none!important}
+.land-top{display:flex;justify-content:space-between;align-items:center;padding:16px 16px 8px}
+.brand{font-weight:800;font-size:18px}
+.brand span{color:var(--primary)}
+.pill{min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-weight:800;font-size:13px;color:var(--fg)}
+.hero h1{font-size:24px;line-height:1.2;margin:8px 0 10px}
+.plan-row{background:var(--surface2);border-radius:12px;padding:12px;margin-top:8px}
+.plan-row b{display:block;margin-bottom:4px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 12px;font-size:12px;color:var(--muted);font-weight:600}
+.srv-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.srv-row:last-child{border-bottom:none}
+.flag{width:28px;text-align:center;font-size:18px}
+.proto{font-size:11px;color:var(--primary);font-weight:700}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(10px)}
+.main{padding:8px 16px 110px}
+.nav{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:100%;max-width:440px;z-index:30;display:flex;justify-content:space-between;align-items:flex-end;padding:8px 6px max(8px,env(safe-area-inset-bottom));border-top:1px solid var(--border);background:var(--surface)}
+.nav button{flex:1;border:none;background:transparent;color:var(--muted);font-size:10px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:2px}
+.nav button.on{color:var(--primary)}
+.nav .home{width:56px;height:56px;border-radius:50%;margin-top:-18px;display:grid;place-items:center;background:var(--surface2);color:var(--fg);font-size:22px}
+.nav button.on .home,.nav .home.on{background:var(--primary);color:var(--primary-fg)}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px}
+.tab{flex-shrink:0;min-height:36px;padding:0 12px;border-radius:999px;border:none;background:var(--surface);color:var(--muted);font-weight:800;font-size:12px}
+.tab.on{background:var(--primary);color:var(--primary-fg)}
+.drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40}
+.drawer{position:absolute;right:0;top:0;bottom:0;width:min(100%,320px);background:var(--bg);padding:16px;overflow-y:auto}
+.modal-bg{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.55);display:grid;place-items:end center;padding:16px}
+.modal{width:100%;max-width:400px;margin-bottom:20px}
+.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);z-index:60;background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:800;font-size:13px;max-width:90%;text-align:center}
+.wheel{width:220px;height:220px;border-radius:50%;margin:12px auto;border:4px solid var(--border);position:relative;transition:transform 4s cubic-bezier(.15,.7,.1,1)}
+.pointer{width:0;height:0;margin:0 auto;border-left:10px solid transparent;border-right:10px solid transparent;border-top:14px solid var(--accent)}
+.tap-btn{width:140px;height:140px;border-radius:50%;border:none;background:var(--primary);color:var(--primary-fg);font-weight:900;font-size:22px;margin:12px auto;display:grid;place-items:center}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.cell{aspect-ratio:1;border:none;border-radius:8px;font-weight:800;font-size:10px;background:var(--primary);color:var(--primary-fg)}
+.cell.open-empty{background:var(--surface2);color:var(--muted)}
+.cell.open-reward{background:var(--ok);color:#111}
+.cell.open-bomb{background:var(--danger);color:#fff}
+.reel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center}
+.reel div{background:var(--surface2);border-radius:12px;padding:20px 8px;font-weight:900;font-size:18px}
+.v-reel{height:180px;overflow:hidden;position:relative;border-radius:16px;border:2px solid var(--border);background:var(--surface2)}
+.v-reel-track{position:absolute;left:0;right:0;top:0;transition:transform 3.2s cubic-bezier(.12,.7,.1,1)}
+.v-reel-item{height:60px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;border-bottom:1px solid var(--border)}
+.v-reel-pointer{position:absolute;left:0;right:0;top:50%;height:60px;margin-top:-30px;border-top:2px solid var(--accent);border-bottom:2px solid var(--accent);pointer-events:none;z-index:2;box-shadow:inset 0 0 20px color-mix(in srgb,var(--accent) 25%, transparent)}
+.game-card{flex:1;min-width:140px;text-align:center;padding:16px 12px;border-radius:16px;background:var(--surface);border:1px solid var(--border)}
+.game-ava{width:64px;height:64px;border-radius:18px;margin:0 auto 10px;display:grid;place-items:center;font-size:28px;background:var(--surface2)}
+.case-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.case-tile{text-align:center;padding:12px;border-radius:14px;background:var(--surface);border:1px solid var(--border)}
+.case-img{width:72px;height:72px;border-radius:14px;margin:0 auto 8px;display:grid;place-items:center;font-size:32px;background:var(--surface2)}
+@keyframes spinPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@keyframes caseOpen{0%{transform:scale(1) rotate(0);opacity:1}40%{transform:scale(1.15) rotate(-8deg)}70%{transform:scale(0.9) rotate(8deg)}100%{transform:scale(1.2) rotate(0);opacity:.3}}
+@keyframes prizePop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.15);opacity:1}100%{transform:scale(1)}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 40%, transparent)}50%{box-shadow:0 0 18px 4px color-mix(in srgb,var(--accent) 35%, transparent)}}
+.v-reel-item.hi{background:color-mix(in srgb,var(--primary) 35%, var(--surface2));color:var(--fg)}
+.case-opening{animation:caseOpen .9s ease-in-out infinite}
+.prize-pop{animation:prizePop .45s ease-out}
+.tap-btn:active{transform:scale(.92)}
+.game-card{transition:transform .15s,border-color .15s}
+.game-card:active{transform:scale(.97)}
+.chip{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--surface2);font-size:11px;font-weight:700;margin:2px}
+
+input[type=checkbox]{appearance:none;-webkit-appearance:none;width:46px;height:28px;padding:0;border-radius:99px;background:var(--surface2);border:1px solid var(--border);position:relative;flex:none;cursor:pointer;transition:background .2s}
+input[type=checkbox]::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
+input[type=checkbox]:checked{background:var(--primary);border-color:var(--primary)}
+input[type=checkbox]:checked::after{transform:translateX(18px);background:var(--primary-fg)}
+input[type=color]{padding:3px;cursor:pointer}
+html[data-theme="custom"]{--bg:color-mix(in srgb,var(--primary) 9%,#07070b);--surface:color-mix(in srgb,var(--primary) 15%,#0d0d12);--surface2:color-mix(in srgb,var(--primary) 21%,#12121a);--border:color-mix(in srgb,var(--primary) 32%,#1a1a22);--muted:color-mix(in srgb,var(--primary) 30%,#b5b5bd);--fg:#f5f5f7}
+.game-card.off{opacity:.55;position:relative}
+.game-card.off .btn{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.soc{display:flex;align-items:center;gap:12px;padding:14px;border-radius:14px;background:var(--surface2);border:1px solid var(--border);color:var(--fg);text-decoration:none;font-weight:800;margin-top:8px}
+.soc.off{opacity:.55;pointer-events:none}
+.soc small{display:block;color:var(--muted);font-weight:600;font-size:12px;margin-top:2px;word-break:break-all}
+.news-img{width:100%;max-height:260px;object-fit:cover;border-radius:14px;margin:8px 0;display:block}
+.chat-img{max-width:100%;max-height:220px;border-radius:10px;margin-top:6px;display:block}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<div id="toast" class="toast hidden"></div>
+<script>
+const DAY=86400000,KEY='jodvpn_cabinet_v2';
+const DOCS=[
+{href:'https://telegra.ph/Politika-konfidencialnosti-JOD-VPN-10-05',ru:'Политика конфиденциальности',en:'Privacy policy'},
+{href:'https://telegra.ph/Polzovatelskoe-soglashenie-JOD-VPN-10-13',ru:'Пользовательское соглашение',en:'Terms of use'}
+];
+const SERVERS=[['🇳🇱','Нидерланды','Netherlands'],['🇳🇱','Нидерланды 2','Netherlands 2'],['🇳🇱','Нидерланды 3','Netherlands 3'],['🇳🇱','Нидерланды 4','Netherlands 4'],['🇪🇪','Эстония','Estonia'],['🇪🇪','Эстония 2','Estonia 2'],['🇪🇪','Эстония 3','Estonia 3'],['🇪🇪','Эстония 4','Estonia 4'],['🇵🇱','Польша','Poland'],['🇪🇸','Испания','Spain'],['🇩🇪','Германия','Germany'],['🔀','Прокси','Proxy']];
+const CATS=[
+{id:'start',ru:'Дешёвый',en:'Budget',br:'35 ГБ · 1 устройство · 2 Германии',be:'35 GB · 1 device · 2 Germany'},
+{id:'comfort',ru:'Комфортный',en:'Comfort',br:'Безлимит · 3 устройства',be:'Unlimited · 3 devices'},
+{id:'family',ru:'Семейный',en:'Family',br:'Безлимит · 6 устройств',be:'Unlimited · 6 devices'},
+{id:'proxy',ru:'Прокси',en:'Proxy',br:'Прокси для Telegram',be:'Proxy for Telegram'}
+];
+const PLANS=[
+{id:'s1',cat:'start',ru:'Дешёвый 1 день /2 Германии',en:'Budget 1 day /2 Germany',price:13,days:1,tr:'35 ГБ',te:'35 GB',devices:1},
+{id:'s7',cat:'start',ru:'Дешёвый неделя /2 Германии',en:'Budget week /2 Germany',price:30,days:7,tr:'35 ГБ',te:'35 GB',devices:1},
+{id:'s30',cat:'start',ru:'Дешёвый месяц /2 Германии',en:'Budget month /2 Germany',price:65,days:30,tr:'35 ГБ',te:'35 GB',devices:1},
+{id:'c7',cat:'comfort',ru:'Комфортный неделя',en:'Comfort week',price:50,days:7,tr:'безлимит',te:'unlimited',devices:3},
+{id:'c30',cat:'comfort',ru:'Комфортный месяц',en:'Comfort month',price:115,days:30,tr:'безлимит',te:'unlimited',devices:3},
+{id:'c60',cat:'comfort',ru:'Комфортный 2 месяца',en:'Comfort 2 months',price:215,days:60,tr:'безлимит',te:'unlimited',devices:3,per:108},
+{id:'c365',cat:'comfort',ru:'Комфортный год',en:'Comfort year',price:990,days:365,tr:'безлимит',te:'unlimited',devices:3,per:81},
+{id:'f30',cat:'family',ru:'Семейный месяц',en:'Family month',price:165,days:30,tr:'безлимит',te:'unlimited',devices:6},
+{id:'f60',cat:'family',ru:'Семейный 2 месяца',en:'Family 2 months',price:340,days:60,tr:'безлимит',te:'unlimited',devices:6,per:170},
+{id:'f365',cat:'family',ru:'Семейный год',en:'Family year',price:1340,days:365,tr:'безлимит',te:'unlimited',devices:6,per:110},
+{id:'p1',cat:'proxy',ru:'Прокси +1 день',en:'Proxy +1 day',price:10,days:1,tr:'прокси TG',te:'TG proxy',devices:1},
+{id:'p7',cat:'proxy',ru:'Прокси +7 дней',en:'Proxy +7 days',price:50,days:7,tr:'прокси TG',te:'TG proxy',devices:1},
+{id:'p30',cat:'proxy',ru:'Прокси +30 дней',en:'Proxy +30 days',price:100,days:30,tr:'прокси TG',te:'TG proxy',devices:1},
+{id:'p60',cat:'proxy',ru:'Прокси +60 дней',en:'Proxy +60 days',price:165,days:60,tr:'прокси TG',te:'TG proxy',devices:1}
+];
+const CASES=[
+{id:'c25',price:25,ru:'Бронза',en:'Bronze',drops:[{l:'+5 ₽',k:'money',v:5,w:40},{l:'+10 ₽',k:'money',v:10,w:25},{l:'1% скидка',k:'discount',v:1,w:20},{l:'+1 день',k:'days',v:1,w:15}]},
+{id:'c50',price:50,ru:'Серебро',en:'Silver',drops:[{l:'+20 ₽',k:'money',v:20,w:35},{l:'+35 ₽',k:'money',v:35,w:25},{l:'3% скидка',k:'discount',v:3,w:20},{l:'+3 дня',k:'days',v:3,w:15},{l:'+2 крутки',k:'spins',v:2,w:5}]},
+{id:'c100',price:100,ru:'Золото',en:'Gold',drops:[{l:'+60 ₽',k:'money',v:60,w:30},{l:'+90 ₽',k:'money',v:90,w:22},{l:'5% скидка',k:'discount',v:5,w:18},{l:'+7 дней',k:'days',v:7,w:18},{l:'+5 круток',k:'spins',v:5,w:12}]}
+];
+const SLOT=[{l:'+1 ₽',v:1,w:40},{l:'+3 ₽',v:3,w:25},{l:'+5 ₽',v:5,w:18},{l:'+10 ₽',v:10,w:12},{l:'+50 ₽',v:50,w:4},{l:'+100 ₽',v:100,w:1}];
+function uid(){return Math.random().toString(36).slice(2,10)}
+function pick(a){let t=a.reduce((s,i)=>s+i.w,0),r=Math.random()*t;for(const i of a){r-=i.w;if(r<=0)return i}return a[0]}
+function plan(id){return PLANS.find(p=>p.id===id)||(id==='trial'?TRIAL:null)}
+function money(n){return n+' ₽'}
+function discLeft(){return Math.max(1,Math.ceil(((S.discountUntil||0)-Date.now())/DAY))}
+function checkDisc(){const d=Number(S.discount)||0;if(!d){S.discount=0;S.discountUntil=0;S._ds=0;return}if(d>(S._ds||0)||!S.discountUntil)S.discountUntil=Date.now()+7*DAY;if(S.discountUntil<Date.now()){S.discount=0;S.discountUntil=0;S._ds=0;return}S._ds=d}
+function discNote(){checkDisc();return S.discount?`<div class="card" style="border-color:var(--accent)"><b>🏷 ${t('Скидка','Discount')} -${S.discount}%</b><p class="muted" style="margin-top:4px">${t('Действует ещё','Valid for')} ${discLeft()} ${t('дн. (хранится 7 дней). Сгорает после покупки тарифа.','more days (kept 7 days). Burns after a plan purchase.')}</p></div>`:''}
+function priceWithDisc(n){
+  checkDisc();
+  const d=Number(S.discount)||0;
+  const p=Math.max(1,Math.round(Number(n)*(1-d/100)));
+  return p;
+}
+function moneyDisc(n){
+  checkDisc();
+  const d=Number(S.discount)||0;
+  const full=Number(n)||0;
+  if(!d) return money(full);
+  const p=priceWithDisc(full);
+  return '<span style="text-decoration:line-through;opacity:.55;font-weight:600;margin-right:6px">'+full+' ₽</span><b style="color:var(--accent)">'+p+' ₽</b>';
+}
+
+function when(ts,lang){if(!ts)return'—';return new Date(ts).toLocaleString(lang==='ru'?'ru-RU':'en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}
+function blip(f=640){if(!S.sound)return;try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.frequency.value=f;g.gain.value=.03;o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.06);setTimeout(()=>c.close(),150)}catch(e){}}
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.remove('hidden');clearTimeout(toast._t);toast._t=setTimeout(()=>el.classList.add('hidden'),2200)}
+function defaultState(){const until=Date.now()+20*DAY;return{entered:false,login:'',isAdmin:false,adminRole:null,adminClient:null,admins:[{login:'admin',pass:'jodvpn2026',role:'admin',protected:true,createdAt:0}],modLog:[],lang:'ru',theme:'blue',light:false,glass:true,sound:true,balance:120,discount:0,tariffId:'c30',subEnd:until,devices:[],gb:5.2,mode:null,modeLock:0,lastWheel:0,tapDay:0,tapsToday:0,lastSlot:0,lastMines:0,freeSpins:1,dualUntil:0,rewards:[],promoHistory:[],promos:[{code:'START',kind:'money',value:50,uses:0,used:0,expires:0}],tickets:[],events:[],progress:null,people:[{login:'TEST',balance:120,tariffId:'c30',subEnd:until,banned:false,muted:false,gb:5.2,devices:[]},{login:'mira',balance:40,tariffId:'s30',subEnd:Date.now()+6*DAY,banned:false,muted:false,gb:2.1,devices:[]}],banned:false,muted:false,tab:'home',game:'wheel',stats:{spins:0,taps:0,slots:0,mines:0,cases:0,spent:0},mines:null,minesLives:3,minesDone:false,wheelDeg:0,spinning:false,pay:null,secret:false,adminOpen:false,drawer:false,openCat:null,caseOpen:null,slotText:'',caseResult:'',floatTap:'',adminSec:'users',adminQ:'',openTicketId:'',customCases:[],myCases:[],caseView:null,gameScreen:null,srvDown:{},offGames:['wheel','tap'],news:[],trialLogins:[],customColor:'#ec4899',adminPerms:null,purchaseHistory:[],menuPage:null,vpnLink:'https://sub.jodvpn.example/s/demo123',vpnVless:'vless://demo-uuid@nl1.jodvpn.example:443?encryption=none&security=reality&type=tcp#JOD-NL',vpnJson:'{\n  "outbounds": [{\n    "protocol": "vless",\n    "tag": "proxy"\n  }]\n}',vpnShow:null}}
+const TRIAL={id:'trial',cat:'start',ru:'Пробный период',en:'Trial',price:0,days:3,tr:'15 ГБ',te:'15 GB',devices:1};
+const PERMS=[['users','Клиенты','Clients'],['promos','Промо','Promos'],['support','Поддержка','Support'],['cases','Кейсы','Cases'],['events','Ивенты','Events'],['news','Новости','News'],['servers','Серверы','Servers']];
+const SOCIALS=[{ic:'✈️',n:'Telegram-канал',en:'Telegram channel',u:'https://t.me/JOD_VPN',sh:'t.me/JOD_VPN'},{ic:'🤖',n:'Telegram-бот',en:'Telegram bot',u:'https://t.me/JODVPN_bot',sh:'@JODVPN_bot'},{ic:'🎵',n:'TikTok',en:'TikTok',u:'http://tiktok.com/@jodik_offisal',sh:'tiktok.com/@jodik_offisal'},{ic:'▶️',n:'YouTube',en:'YouTube',u:'',sh:'',off:true}];
+function srvDown(i){return !!(S.srvDown||{})[i]}
+function srvChip(i){return srvDown(i)?`<span class="chip" style="background:color-mix(in srgb,var(--danger) 25%,transparent);color:var(--danger)">${t('недоступен','down')}</span>`:`<span class="chip" style="background:color-mix(in srgb,var(--ok) 25%,transparent);color:var(--ok)">${t('доступен','up')}</span>`}
+function adminServers(){if(!can('servers'))return'';const down=SERVERS.filter((_,i)=>srvDown(i)).length;return`<div class="card"><b>🖥 ${t('Серверы','Servers')}</b><p class="muted" style="margin-top:4px">${t('Отметьте, какие серверы сейчас доступны. Пользователи видят статус на главной и в списке серверов.','Mark which servers are up. Users see the status on Home.')} ${down?'· ⚠️ '+down+' '+t('недоступно','down'):'· ✅ '+t('все доступны','all up')}</p>${SERVERS.map(([f,ru,en],i)=>`<div class="row" style="justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span>${f} ${S.lang==='ru'?ru:en}<br>${srvChip(i)}</span><button type="button" class="btn ${srvDown(i)?'':'danger'}" style="min-height:36px" data-srv="${i}">${srvDown(i)?t('Включить','Set up'):t('Отключить','Set down')}</button></div>`).join('')}${down?`<button type="button" class="btn ghost block" style="margin-top:10px" id="srvAllUp">${t('Все доступны','All up')}</button>`:''}</div><div class="card"><b>🔄 ${t('Синхронизация','Sync')}</b><p class="muted" style="margin-top:4px">${t('Скоро: автопроверка серверов и выдача подписок через бота H1Cloud.','Soon: auto status checks and subscription issuing via the H1Cloud bot.')}</p></div>`}
+function bindAdminServers(){document.querySelectorAll('[data-srv]').forEach(b=>b.onclick=()=>{if(!can('servers'))return;const i=b.dataset.srv;S.srvDown=S.srvDown||{};if(S.srvDown[i])delete S.srvDown[i];else S.srvDown[i]=1;pushMod(S.srvDown[i]?'server_down':'server_up',SERVERS[i][1],'');toast('OK');render()});const a=document.getElementById('srvAllUp');if(a)a.onclick=()=>{S.srvDown={};toast('OK');render()}}
+const PERSONAL=['rewards','myCases','stats','discount','discountUntil','_ds','promoHistory','freeSpins','dualUntil','lastWheel','lastSlot','lastMines','mines','minesLives','minesDone','tapDay','tapsToday','mode','modeLock','progress','purchaseHistory','wheelDeg','caseResult','slotText','floatTap'];
+function cl(v){return v===undefined?undefined:JSON.parse(JSON.stringify(v))}
+function stashProfile(){if(!S.entered||!S.login)return;S.profiles=S.profiles||{};const o={};PERSONAL.forEach(f=>o[f]=cl(S[f]));S.profiles[String(S.login).toLowerCase()]=o}
+function loadProfile(name){const k=String(name).toLowerCase();S.profiles=S.profiles||{};const o=S.profiles[k];if(o){const d=defaultState();PERSONAL.forEach(f=>S[f]=cl(f in o?o[f]:d[f]))}else if(S._migrated){const d=defaultState();PERSONAL.forEach(f=>S[f]=cl(d[f]))}else S._migrated=true;S.caseView=null;S.gameScreen=null;S.caseOpen=null}
+let PIMG=null,NMEDIA='',NTYPE='';
+function esc(x){return String(x==null?'':x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function permsOf(a){return (a&&a.perms)||{users:1,promos:1,support:1}}
+function can(k){return isSenior()||!!(S.adminPerms||{users:1,promos:1,support:1})[k]}
+function lum(h){const n=parseInt(String(h).replace('#',''),16)||0,r=n>>16&255,g=n>>8&255,b=n&255;return(.299*r+.587*g+.114*b)/255}
+function applyCustom(){const r=document.documentElement;if(S.theme==='custom'){const c=S.customColor||'#ec4899';r.style.setProperty('--primary',c);r.style.setProperty('--primary-fg',lum(c)>.6?'#111':'#fff')}else{r.style.removeProperty('--primary');r.style.removeProperty('--primary-fg')}}
+function shrinkImg(file,max,cb){const rd=new FileReader();rd.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.72))};im.onerror=()=>toast(t('Не удалось открыть фото','Bad image'));im.src=rd.result};rd.readAsDataURL(file)}
+function takeImg(){const x=PIMG;PIMG=null;return x||undefined}
+function aiAfter(id,text){const tk=S.tickets.find(x=>x.id===id);if(!tk||(tk.mode||'ai')!=='ai')return;setTimeout(()=>{const k=S.tickets.find(x=>x.id===id);if(!k||(k.mode||'ai')!=='ai'||k.status==='closed')return;k.thread.push({from:'ai',login:'JOD AI',text:aiReply(text||'').replace(/\n/g,'\n'),at:Date.now()});save();if(S.tab==='support'&&S.openTicketId===id&&!S.adminOpen)render()},800)}
+function bindSupportExtra(){const pk=document.getElementById('imgPick');if(pk)pk.onchange=()=>{const f=pk.files&&pk.files[0];if(!f)return;if(!/^image\//.test(f.type)){toast(t('Нужно фото','Image only'));return}shrinkImg(f,900,d=>{PIMG=d;const n=document.getElementById('imgNote');if(n)n.textContent='📷 '+t('фото прикреплено','photo attached');toast(t('Фото прикреплено','Photo attached'))})};
+document.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{const tk=S.tickets.find(x=>x.id===S.openTicketId);if(!tk||tk.status==='closed')return;tk.thread.push({from:'user',login:S.login,text:b.dataset.q,at:Date.now()});aiAfter(tk.id,b.dataset.q);render()});
+const sp=document.getElementById('toSpecialist');if(sp)sp.onclick=()=>{const tk=S.tickets.find(x=>x.id===S.openTicketId);if(!tk)return;tk.mode='human';tk.thread.push({from:'ai',login:'JOD AI',text:t('Передал обращение живому специалисту. ИИ отключён, ответ придёт сюда.','Passed to a human specialist. AI is off, the reply will appear here.'),at:Date.now()});toast(t('Передано специалисту','Sent to specialist'));render()};
+const ta=document.getElementById('toAI');if(ta)ta.onclick=()=>{const tk=S.tickets.find(x=>x.id===S.openTicketId);if(!tk)return;tk.mode='ai';toast(t('ИИ снова отвечает','AI is back'));render()}}
+function trialUsed(){return(S.trialLogins||[]).includes(String(S.login).toLowerCase())}
+function trialCard(){const used=trialUsed(),busy=active()&&S.tariffId!=='trial';return`<div class="card"><b>🎁 ${t('Пробный период','Free trial')}</b><div class="meta" style="margin-top:6px"><span>⏱ 3 ${t('дня','days')}</span><span>📶 15 ${t('ГБ','GB')}</span><span>🌍 ${t('все серверы','all servers')}</span><span>📱 1</span></div><p class="muted" style="margin:8px 0">${used?t('Вы уже активировали пробный период — повторно нельзя.','Trial already used — only once per account.'):busy?t('Доступен, пока нет активной подписки.','Available when you have no active plan.'):t('Один раз на аккаунт.','Once per account.')}</p><button type="button" class="btn block" id="trialBtn" ${used||busy?'disabled':''}>${used?t('Уже использован','Already used'):t('Активировать пробный','Activate trial')}</button></div>`}
+function bindTrial(){const b=document.getElementById('trialBtn');if(!b)return;b.onclick=()=>{if(trialUsed()||(active()&&S.tariffId!=='trial'))return;S.trialLogins=S.trialLogins||[];S.trialLogins.push(String(S.login).toLowerCase());S.tariffId='trial';S.subEnd=Date.now()+3*DAY;S.gb=0;S.purchaseHistory=S.purchaseHistory||[];S.purchaseHistory.unshift({title:t('Пробный период 3 дня / 15 ГБ','Trial 3 days / 15 GB'),kind:'trial',amount:0,ok:true,at:Date.now()});syncSelf();toast(t('Пробный период активирован','Trial activated'));render()}}
+function newsHTML(){const l=S.news||[];return`<div class="row" style="margin-bottom:12px;gap:8px"><button type="button" class="btn ghost" data-menu="main">←</button><b>📰 ${t('Новости','News')}</b></div>`+(l.length?l.map(n=>`<div class="card"><b>${esc(n.title)}</b><div class="muted" style="font-size:11px">${when(n.at,S.lang)}</div>${n.media?(n.type==='video'?`<video class="news-img" src="${n.media}" controls playsinline></video>`:`<img class="news-img" src="${n.media}" alt="">`):''}<p style="font-size:14px;white-space:pre-wrap">${esc(n.text)}</p></div>`).join(''):`<div class="card"><p class="muted">${t('Новостей пока нет','No news yet')}</p></div>`)}
+function adminNews(){if(!can('news'))return'';const d=S._nd||(S._nd={id:'',title:'',text:'',url:''});return`<div class="card"><b>📰 ${d.id?t('Редактировать новость','Edit news'):t('Новая новость','New post')}</b><input id="newsTitle" value="${esc(d.title)}" placeholder="${t('Название','Title')}" style="margin-top:10px"><textarea id="newsText" rows="4" placeholder="${t('Текст новости','Text')}" style="margin-top:8px">${esc(d.text)}</textarea><label class="btn ghost block" style="margin-top:8px">📎 ${t('Фото или видео (до 2 МБ)','Photo / video (≤2 MB)')}<input type="file" id="newsFile" accept="image/*,video/*" style="display:none"></label><input id="newsUrl" value="${esc(d.url)}" placeholder="${t('или ссылка на фото/видео','or media URL')}" style="margin-top:8px"><div class="muted" id="newsNote" style="margin-top:6px;font-size:12px">${NMEDIA?'✅ '+t('медиа прикреплено','media attached'):''}</div><button type="button" class="btn block" style="margin-top:10px" id="newsSave">${d.id?t('Сохранить','Save'):t('Опубликовать','Publish')}</button>${d.id?`<button type="button" class="btn ghost block" style="margin-top:8px" id="newsCancel">${t('Отмена','Cancel')}</button>`:''}</div>`+(S.news||[]).map(n=>`<div class="card"><b>${esc(n.title)}</b><div class="muted" style="font-size:11px">${when(n.at,S.lang)}${n.media?' · '+(n.type==='video'?'🎬':'🖼'):''}</div><div class="row" style="margin-top:8px"><button type="button" class="btn ghost grow" data-news-edit="${n.id}">✏️ ${t('Править','Edit')}</button><button type="button" class="btn danger" data-news-del="${n.id}">×</button></div></div>`).join('')}
+function bindAdminNews(){const d=S._nd;if(!d||!document.getElementById('newsTitle'))return;const T=document.getElementById('newsTitle'),X=document.getElementById('newsText'),U=document.getElementById('newsUrl');T.oninput=()=>d.title=T.value;X.oninput=()=>d.text=X.value;U.oninput=()=>d.url=U.value;
+const f=document.getElementById('newsFile');f.onchange=()=>{const fl=f.files[0];if(!fl)return;const note=document.getElementById('newsNote');if(/^image\//.test(fl.type))shrinkImg(fl,1000,x=>{NMEDIA=x;NTYPE='image';note.textContent='✅ '+t('фото прикреплено','photo attached')});else if(/^video\//.test(fl.type)){if(fl.size>2*1024*1024){toast(t('Видео больше 2 МБ — дай ссылкой','Video >2 MB — use a URL'));return}const rd=new FileReader();rd.onload=()=>{NMEDIA=rd.result;NTYPE='video';note.textContent='✅ '+t('видео прикреплено','video attached')};rd.readAsDataURL(fl)}};
+document.getElementById('newsSave').onclick=()=>{if(!can('news'))return;const title=T.value.trim(),text=X.value.trim();if(!title){toast(t('Нужно название','Title required'));return}let media=NMEDIA,type=NTYPE;const u=U.value.trim();if(!media&&u){media=u;type=/\.(mp4|webm|mov)(\?|$)/i.test(u)?'video':'image'}S.news=S.news||[];if(d.id){const n=S.news.find(x=>x.id===d.id);if(n){n.title=title;n.text=text;if(media){n.media=media;n.type=type}n.edited=Date.now()}}else S.news.unshift({id:uid(),title,text,media,type,at:Date.now(),by:S.login});S._nd=null;NMEDIA='';NTYPE='';toast(t('Готово','Done'));render()};
+const c=document.getElementById('newsCancel');if(c)c.onclick=()=>{S._nd=null;NMEDIA='';NTYPE='';render()};
+document.querySelectorAll('[data-news-edit]').forEach(b=>b.onclick=()=>{const n=(S.news||[]).find(x=>x.id===b.dataset.newsEdit);if(!n)return;S._nd={id:n.id,title:n.title,text:n.text,url:''};NMEDIA=n.media||'';NTYPE=n.type||'';render()});
+document.querySelectorAll('[data-news-del]').forEach(b=>b.onclick=()=>{if(!can('news'))return;S.news=(S.news||[]).filter(x=>x.id!==b.dataset.newsDel);toast(t('Удалено','Deleted'));render()})}
+let S=load();
+function load(){try{const r=localStorage.getItem(KEY);if(r){const d=Object.assign(defaultState(),JSON.parse(r));(d.events||[]).forEach(e=>{e.start=Number(e.start)||0;e.end=Number(e.end)||0});
+  const bad=/iphone|phone|laptop|android|demo/i;
+  d.devices=(d.devices||[]).filter(x=>x&&x.name&&!bad.test(String(x.name)));
+  (d.people||[]).forEach(p=>{p.devices=(p.devices||[]).filter(x=>x&&x.name&&!bad.test(String(x.name)))});
+  return d}}catch(e){}return defaultState()}
+function save(){stashProfile();const c={...S};delete c.pay;delete c.secret;delete c.drawer;delete c.spinning;delete c._nd;localStorage.setItem(KEY,JSON.stringify(c))}
+function applyTheme(){applyCustom();document.documentElement.dataset.theme=S.theme;document.documentElement.dataset.light=(S.light||S.theme==='white')?'1':'0';document.documentElement.dataset.glass=S.glass?'1':'0';document.documentElement.lang=S.lang}
+function t(ru,en){return S.lang==='ru'?ru:en}
+
+function pushMod(action, target, reason, until){
+  S.modLog=S.modLog||[];
+  S.modLog.unshift({id:uid(),by:S.login||'system',action,target,reason:reason||'',until:until||0,at:Date.now()});
+  S.modLog=S.modLog.slice(0,200);
+}
+function isProtectedPerson(p){
+  if(!p) return false;
+  if(p.protected) return true;
+  if(String(p.login).toUpperCase()==='AAAP4GPMX') return true;
+  const ad=(S.admins||[]).find(a=>a.login===p.login);
+  if(ad&&ad.protected) return true;
+  return false;
+}
+function banUntilActive(p){
+  if(!p||!p.banned) return false;
+  if(p.banUntil&&Date.now()>p.banUntil){p.banned=false;p.banReason='';p.banUntil=0;return false}
+  return !!p.banned;
+}
+function muteUntilActive(p){
+  if(!p||!p.muted) return false;
+  if(p.muteUntil&&Date.now()>p.muteUntil){p.muted=false;p.muteReason='';p.muteUntil=0;return false}
+  return !!p.muted;
+}
+function isSenior(){return S.isAdmin&&S.adminRole==='senior'}
+function active(){return!!S.tariffId&&S.subEnd>Date.now()}
+function tapLimit(){const p=plan(S.tariffId);if(!p)return 0;if(p.cat==='family')return 100;if(p.cat==='comfort')return 50;return 20}
+function wheelPool(){const p=plan(S.tariffId),cat=p?p.cat:'start';
+if(cat==='family')return[{l:'0',k:'none',v:0,w:40},{l:'+15 ₽',k:'money',v:15,w:18},{l:'+3 дн',k:'days',v:3,w:14},{l:'+2 крутки',k:'spins',v:2,w:12},{l:'+40 ₽',k:'money',v:40,w:10},{l:'+7 дн',k:'days',v:7,w:6}];
+if(cat==='comfort')return[{l:'0',k:'none',v:0,w:52},{l:'+8 ₽',k:'money',v:8,w:18},{l:'+1 дн',k:'days',v:1,w:14},{l:'+1 крутка',k:'spins',v:1,w:10},{l:'+20 ₽',k:'money',v:20,w:6}];
+return[{l:'0',k:'none',v:0,w:68},{l:'+3 ₽',k:'money',v:3,w:16},{l:'+1 дн',k:'days',v:1,w:10},{l:'+1 крутка',k:'spins',v:1,w:6}]}
+function reward(kind,value,label,extra){
+  // Все награды активируются сразу. Кейс → инвентарь.
+  const k=kind||'money';
+  const v=Number(value)||0;
+  let name=label||'';
+  let applied=true;
+  if(k==='case'){
+    const id=String((extra&&(extra.caseId||extra.value))||value||'').trim();
+    const c=getCaseById(id);
+    if(c){
+      S.myCases=S.myCases||[];
+      S.myCases.push({...c,gotAt:Date.now(),from:(extra&&extra.from)||'reward'});
+      name=name||(t('Кейс: ','Case: ')+(c.name||c.ru||id));
+      toast(name);
+    } else {
+      name=name||t('Кейс не найден','Case not found');
+      applied=false;
+    }
+  } else if(k==='money'){
+    S.balance=(S.balance||0)+v;
+    name=name||('+'+v+' ₽');
+  } else if(k==='days'){
+    S.subEnd=Math.max(Date.now(),S.subEnd||0)+v*DAY;
+    name=name||('+'+v+' '+t('дн.','d'));
+  } else if(k==='spins'){
+    S.freeSpins=(S.freeSpins||0)+v;
+    name=name||('+'+v+' '+t('круток','spins'));
+  } else if(k==='discount'){
+    S.discount=Math.min(50,(S.discount||0)+v);
+    name=name||('+'+v+'%');
+  } else if(k==='gb'){
+    // бонусный «кредит» трафика как метка в истории
+    S.gbBonus=(S.gbBonus||0)+v;
+    name=name||('+'+v+' GB');
+  } else if(k==='dual'){
+    S.dualUntil=Math.max(Date.now(),S.dualUntil||0)+v*DAY;
+    name=name||t('Барабан+тап','Wheel+tap');
+  } else {
+    name=name||String(k)+' '+v;
+  }
+  S.rewards=[{id:uid(),name:name,kind:k,value:v,at:Date.now(),applied:applied},...(S.rewards||[])].slice(0,60);
+  try{syncSelf()}catch(e){}
+  return name;
+}
+
+function render(){
+  const active=document.activeElement;
+  const focusId=(active&&active.id)?active.id:(S._focusId||null);
+  const selStart=(active&&(active.tagName==='INPUT'||active.tagName==='TEXTAREA')&&typeof active.selectionStart==='number')?active.selectionStart:null;
+  // don't restore focus on checkboxes
+  const skipFocus=active&&active.type==='checkbox';
+  checkDisc();
+  applyTheme();
+  save();
+  const app=document.getElementById('app');
+  if(!S.entered){
+    app.innerHTML=typeof landingHTML==='function'?landingHTML():gateHTML();
+    if(typeof bindLanding==='function')bindLanding();
+    else if(typeof bindGate==='function')bindGate();
+  } else {
+    app.innerHTML=shellHTML();
+    bindShell();
+  }
+  if(focusId&&!skipFocus){
+    const el=document.getElementById(focusId);
+    if(el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA')&&el.type!=='checkbox'){
+      try{el.focus();if(selStart!=null&&el.setSelectionRange)el.setSelectionRange(selStart,selStart)}catch(e){}
+    }
+  }
+}
+function planCard(p,plain){return`<div class="plan-row"><b>📦 ${S.lang==='ru'?p.ru:p.en} — ${(plain?money(p.price):moneyDisc(p.price))}${p.per&&(plain||!S.discount)?` <span class="muted">(≈${p.per} ₽/${t('мес','mo')})</span>`:''}</b><div class="meta">⏱ ${p.days} ${t('дней','days')} · 📶 ${S.lang==='ru'?p.tr:p.te} · 📱 ${p.devices} ${t('устр.','dev.')}${(!plain&&S.discount)?` · 🏷 -${S.discount}%`:''}</div></div>`}
+function landingHTML(){return`<div class="land-top"><div class="brand">JOD <span>VPN</span></div><div class="row"><button class="pill" id="btnLight">${S.light?'☀':'☾'}</button><button class="pill" id="btnLang">${S.lang==='ru'?'RU':'EN'}</button></div></div><div class="main" style="padding-top:0"><div class="card hero"><div class="muted" style="font-weight:800;letter-spacing:1px;text-transform:uppercase;font-size:11px">JOD VPN</div><h1>${t('VPN, тарифы и мини-игры','VPN, plans and mini-games')}</h1><p class="muted">${t('Доступ к серверам VLESS Reality, кабинет и бонусы. Оплата демо: сами отмечаете, прошёл платёж или нет.','VLESS Reality servers, cabinet and bonuses. Demo payment: confirm success or failure yourself.')}</p><div class="row" style="margin-top:14px"><input id="loginField" class="grow" value="TEST" placeholder="${t('Логин','Login')}"><button class="btn" id="btnEnter">${t('Войти','Enter')}</button></div></div><h2 style="font-size:14px;margin:8px 0">${t('Тарифы','Plans')}</h2>${CATS.map(c=>`<div class="card" style="padding:0"><button class="btn ghost block" style="justify-content:space-between;border:none;border-radius:var(--radius)" data-cat="${c.id}"><span style="text-align:left"><b>${S.lang==='ru'?c.ru:c.en}</b><br><span class="muted">${S.lang==='ru'?c.br:c.be}</span></span><span>${S.openCat===c.id?'–':'+'}</span></button>${S.openCat===c.id?`<div style="padding:0 14px 14px">${PLANS.filter(p=>p.cat===c.id).map(p=>planCard(p,true)).join('')}</div>`:''}</div>`).join('')}<h2 style="font-size:14px;margin:12px 0 8px">${t('Серверы','Servers')}</h2><div class="card" style="padding:8px 16px">${SERVERS.map(([f,ru,en],i)=>`<div class="srv-row"><div class="flag">${f}</div><div class="grow"><b>${S.lang==='ru'?ru:en}</b><div class="proto">VLESS / TCP / REALITY</div></div>${srvChip(i)}</div>`).join('')}</div></div>`}
+function bindLanding(){document.getElementById('btnLight').onclick=()=>{S.light=!S.light;if(S.light)S.theme='white';else if(S.theme==='white')S.theme='black';applyTheme();render()};document.getElementById('btnLang').onclick=()=>{S.lang=S.lang==='ru'?'en':'ru';render()};document.getElementById('btnEnter').onclick=()=>{enterAs((document.getElementById('loginField').value||'TEST').trim());blip()};document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{S.openCat=S.openCat===b.dataset.cat?null:b.dataset.cat;render()})}
+function enterAs(name){stashProfile();loadProfile(name);const found=S.people.find(p=>p.login.toLowerCase()===name.toLowerCase());S.login=found?found.login:name;if(found){S.balance=found.balance;S.tariffId=found.tariffId;S.subEnd=found.subEnd;S.devices=found.devices;S.gb=found.gb;S.banned=found.banned;S.muted=found.muted}else{S.balance=0;S.tariffId=null;S.subEnd=0;S.devices=[];S.gb=0;S.people.push({login:name,balance:0,tariffId:null,subEnd:0,banned:false,muted:false,gb:0,devices:[]})}S.devices=(S.devices||[]).filter(x=>x&&x.name&&!/iphone|phone|laptop|android|demo/i.test(String(x.name)));
+S.entered=true;S.tab='home';S.adminOpen=false;if(S.banned){toast(t('Вы заблокированы','You are banned'));}render()}
+function shellHTML(){return`<div class="topbar"><button class="brand" id="logoTap" style="border:none;background:transparent;color:var(--fg)">JOD <span>VPN</span></button><button class="pill" id="menuBtn">☰</button></div><div class="main">${S.adminOpen?adminHTML():viewHTML()}</div><nav class="nav">${navBtn('buy','🛒',t('Покупка','Buy'))}${navBtn('support','💬',t('Поддержка','Support'))}<button data-tab="home"><div class="home ${S.tab==='home'&&!S.adminOpen?'on':''}">🏠</div></button>${navBtn('events','🎉',t('Ивенты','Events'))}${navBtn('games','🎮',t('Игры','Games'))}</nav>${S.drawer?drawerHTML():''}${S.topupOpen?topupHTML():''}${S.pay?payHTML():''}${S.secret?secretHTML():''}`}
+function navBtn(id,icon,label){return`<button data-tab="${id}" class="${S.tab===id&&!S.adminOpen?'on':''}"><span style="font-size:18px">${icon}</span>${label}</button>`}
+function viewHTML(){
+  const _me=S.people.find(p=>p.login===S.login);if(_me){banUntilActive(_me);muteUntilActive(_me);S.banned=!!_me.banned;S.muted=!!_me.muted;S.banReason=_me.banReason||'';if(_me.blacklist)S.banned=true;}
+if(S.banned&&!S.isAdmin){
+    return `<div class="card" style="text-align:center;padding:40px 16px;margin-top:40px">
+      <div style="font-size:48px;margin-bottom:12px">🚫</div>
+      <h1 style="font-size:22px;margin-bottom:8px">${t('Аккаунт заблокирован','Account banned')}</h1>
+      <p class="muted">${t('Обратитесь в поддержку','Contact support')}: @AAAP4GPMX</p>
+      <p class="muted" style="margin-top:8px;font-size:12px">${S.banReason||''}</p>
+    </div>`;
+  }
+  if(S.tab==='buy')return buyHTML();
+  if(S.tab==='support')return supportHTML();
+  if(S.tab==='events')return eventsHTML();
+  if(S.tab==='games')return gamesHTML();
+  return homeHTML();
+}
+function homeHTML(){
+  const p=plan(S.tariffId),ok=active();
+  const daysLeft=ok?Math.max(0,Math.ceil((S.subEnd-Date.now())/DAY)):0;
+  const subUrl=S.vpnLink||('https://sub.jodvpn.ru/'+encodeURIComponent(S.login||'user'));
+  const vless=S.vpnVless||('vless://'+btoa(S.login||'user').slice(0,8)+'-demo@nl1.jodvpn.ru:443?encryption=none&security=reality&type=tcp&headerType=&sni=www.microsoft.com&fp=chrome&pbk=demo&sid=abcd#JOD-NL');
+  const jcfg=S.vpnJson||'{\n  "remarks": "JOD VPN",\n  "dns": { "servers": ["1.1.1.1"] },\n  "outbounds": [{ "protocol": "vless", "tag": "proxy" }]\n}';
+  const show=S.vpnShow;
+  return `
+  <div class="card" style="background:linear-gradient(135deg,color-mix(in srgb,var(--primary) 22%, var(--surface)),var(--surface));border-color:color-mix(in srgb,var(--primary) 35%, var(--border))">
+    <div class="row" style="justify-content:space-between;align-items:flex-start">
+      <div>
+        <div class="muted" style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase">JOD VPN</div>
+        <h1 style="font-size:22px;margin-top:4px">${S.login}${S.isAdmin?' <span style="color:var(--accent)">👑</span>':''}</h1>
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:900;font-size:18px">${money(S.balance)}</div>
+        <div class="muted" style="font-size:11px">${t('баланс','balance')}</div>
+      </div>
+    </div>
+    ${ok&&p?`
+      <div style="margin-top:14px;padding:12px;border-radius:12px;background:var(--surface2)">
+        <div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:900;font-size:16px">${S.lang==='ru'?p.ru:p.en}</div>
+            <div class="muted" style="font-size:12px;margin-top:2px">${t('до','until')} ${when(S.subEnd,S.lang)}</div>
+          </div>
+          <div class="chip" style="background:var(--ok);color:#052e16">${daysLeft} ${t('дн.','d')}</div>
+        </div>
+        <div class="meta" style="margin-top:10px">
+          <span>📶 ${S.lang==='ru'?p.tr:p.te}</span>
+          <span>📱 ${S.devices.length}/${p.devices}</span>
+          <span>📥 ${S.gb.toFixed(1)} GB</span>
+        </div>
+      </div>
+    `:`
+      <div style="margin-top:14px;padding:12px;border-radius:12px;background:var(--surface2)">
+        <b>${t('Нет активного тарифа','No active plan')}</b>
+        <p class="muted" style="margin-top:6px;font-size:12px">${t('Купите VPN во вкладке «Покупка»','Buy VPN in the Buy tab')}</p>
+        <button class="btn block" style="margin-top:10px" data-tab-go="buy">${t('Выбрать тариф','Choose plan')}</button>
+      </div>
+    `}
+  </div>
+
+  ${ok?`
+  <div class="card">
+    <b style="font-size:15px">🔐 ${t('Мой VPN','My VPN')}</b>
+    <p class="muted" style="margin:6px 0 12px;font-size:12px">${t('Выберите, как получить доступ','Choose how to get access')}</p>
+    <div class="row wrap">
+      <button class="btn ghost" data-vpn="page">🌐 ${t('Страница подписки','Subscription page')}</button>
+      <button class="btn ghost" data-vpn="add">➕ ${t('Добавить в приложение','Add to app')}</button>
+      <button class="btn ghost" data-vpn="copy">📋 ${t('Ссылка для копирования','Copy link')}</button>
+      <button class="btn ghost" data-vpn="vless">🔑 ${t('Ключи vless://','vless:// keys')}</button>
+      <button class="btn ghost" data-vpn="json">🧩 JSON</button>
+    </div>
+    ${show==='page'?`
+      <div style="margin-top:12px;padding:12px;border-radius:12px;background:var(--surface2)">
+        <div class="muted" style="font-size:11px;font-weight:800">${t('СТРАНИЦА ПОДПИСКИ','SUBSCRIPTION PAGE')}</div>
+        <p style="margin-top:8px;word-break:break-all;font-size:13px;font-family:monospace">${subUrl}</p>
+        <div class="row wrap" style="margin-top:10px">
+          <button class="btn" data-copy="${subUrl}">${t('Копировать','Copy')}</button>
+          <a class="btn ghost" href="${subUrl}" target="_blank" rel="noopener">${t('Открыть','Open')}</a>
+        </div>
+      </div>
+    `:''}
+    ${show==='add'?`
+      <div style="margin-top:12px;padding:12px;border-radius:12px;background:var(--surface2)">
+        <div class="muted" style="font-size:11px;font-weight:800">${t('ДОБАВИТЬ В ПРИЛОЖЕНИЕ','ADD TO APP')}</div>
+        <p class="muted" style="margin-top:8px;font-size:12px">${t('Откройте приложение и импортируйте подписку','Open the app and import the subscription')}</p>
+        <div class="row wrap" style="margin-top:10px">
+          <a class="btn" href="happ://add/${encodeURIComponent(subUrl)}" style="text-decoration:none">+ Happ</a>
+          <a class="btn ghost" href="v2raytun://import/${encodeURIComponent(subUrl)}" style="text-decoration:none">+ v2rayTun</a>
+          <a class="btn ghost" href="incy://import/${encodeURIComponent(subUrl)}" style="text-decoration:none">+ INCY</a>
+        </div>
+        <button class="btn block" style="margin-top:10px" data-copy="${subUrl}">📋 ${t('Скопировать ссылку подписки','Copy subscription link')}</button>
+      </div>
+    `:''}
+    ${show==='copy'?`
+      <div style="margin-top:12px;padding:12px;border-radius:12px;background:var(--surface2)">
+        <div class="muted" style="font-size:11px;font-weight:800">${t('ССЫЛКА ДЛЯ КОПИРОВАНИЯ','COPY LINK')}</div>
+        <p style="margin-top:8px;word-break:break-all;font-size:12px;font-family:monospace">${subUrl}</p>
+        <button class="btn block" style="margin-top:10px" data-copy="${subUrl}">${t('Копировать','Copy')}</button>
+      </div>
+    `:''}
+    ${show==='vless'?`
+      <div style="margin-top:12px;padding:12px;border-radius:12px;background:var(--surface2)">
+        <div class="muted" style="font-size:11px;font-weight:800">${t('КЛЮЧИ VLESS','VLESS KEYS')}</div>
+        <p style="margin-top:8px;word-break:break-all;font-size:11px;font-family:monospace;line-height:1.4">${vless}</p>
+        <button class="btn block" style="margin-top:10px" data-copy="${vless.replace(/"/g,'&quot;')}">${t('Копировать ключ','Copy key')}</button>
+      </div>
+    `:''}
+    ${show==='json'?`
+      <div style="margin-top:12px;padding:12px;border-radius:12px;background:var(--surface2)">
+        <div class="muted" style="font-size:11px;font-weight:800">JSON</div>
+        <pre style="margin-top:8px;font-size:11px;white-space:pre-wrap;word-break:break-all;font-family:monospace;max-height:160px;overflow:auto">${jcfg}</pre>
+        <button class="btn block" style="margin-top:10px" data-copy-json="1">${t('Копировать JSON','Copy JSON')}</button>
+      </div>
+    `:''}
+  </div>
+  `:''}
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px">
+      <b>${t('Устройства','Devices')}</b>
+      <span class="muted" style="font-size:12px">${S.devices.length}${p?' / '+p.devices:''}</span>
+    </div>
+    ${S.devices.length?S.devices.map((d,i)=>`
+      <div class="row" style="justify-content:space-between;padding:10px 0;border-top:1px solid var(--border)">
+        <div>
+          <div style="font-weight:700">${d.name||('Device '+(i+1))}</div>
+          <div class="muted" style="font-family:monospace;font-size:12px">${d.ip||'—'}</div>
+        </div>
+        <span class="chip">${t('онлайн','online')}</span>
+      </div>`).join(''):`<p class="muted">${t('Пока нет устройств','No devices yet')}</p>`}
+  </div>
+
+  <div class="card">
+    <b>${t('Серверы','Servers')}</b>
+    <p class="muted" style="font-size:12px;margin:4px 0 8px">VLESS · TCP · REALITY</p>
+    ${SERVERS.map(([f,ru,en],i)=>`
+      <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px">
+        <span>${f} ${S.lang==='ru'?ru:en}</span>
+        ${srvChip(i)}
+      </div>`).join('')}
+  </div>
+
+  <div class="card">
+    <b>${t('Быстрые действия','Quick actions')}</b>
+    <div class="row wrap" style="margin-top:10px">
+      <button class="btn ghost" data-tab-go="buy">🛒 ${t('Продлить','Extend')}</button>
+      <button class="btn ghost" data-tab-go="games">🎮 ${t('Игры','Games')}</button>
+      <button class="btn ghost" data-tab-go="support">💬 ${t('Поддержка','Support')}</button>
+    </div>
+  </div>`;
+}
+function buyHTML(){if(S.noBuy||(S.people.find(p=>p.login===S.login)||{}).noBuy){return `<div class="card" style="text-align:center;padding:28px"><div style="font-size:40px">🚫</div><b>${t('Покупки запрещены','Purchases forbidden')}</b></div>`;}return`<h1 style="font-size:20px;margin-bottom:12px">${t('Покупка VPN','Buy VPN')}</h1>${trialCard()}${discNote()}${CATS.map(c=>`<div class="card" style="padding:0"><button class="btn ghost block" style="justify-content:space-between;border:none" data-cat="${c.id}"><span style="text-align:left"><b>${S.lang==='ru'?c.ru:c.en}</b><br><span class="muted">${S.lang==='ru'?c.br:c.be}</span></span><span>${S.openCat===c.id?'–':'+'}</span></button>${S.openCat===c.id?`<div style="padding:0 14px 14px">${PLANS.filter(p=>p.cat===c.id).map(p=>`${planCard(p)}<button class="btn block" style="margin-top:8px" data-buy="${p.id}">${t('Оформить','Checkout')} · ${priceWithDisc(p.price)} ₽</button>`).join('')}</div>`:''}</div>`).join('')}`}
+
+function aiReply(text){
+  const q=String(text||'').toLowerCase(),pl=plan(S.tariffId),on=active(),left=on?Math.max(1,Math.ceil((S.subEnd-Date.now())/DAY)):0;
+  const st=on?t('Сейчас у вас: '+(pl?pl.ru:'тариф')+', осталось ~'+left+' дн.','Now: '+(pl?pl.en:'plan')+', ~'+left+' days left.'):t('Сейчас активной подписки нет.','No active plan right now.');
+  if(/мо[яй] подписк|сколько осталось|когда законч|до какого|my plan|expire/.test(q)) return st+t(' Продлить: 🛒 Покупка → тариф → «Оформить».',' Renew: 🛒 Buy → plan → Checkout.');
+  if(/скидк|discount/.test(q)){checkDisc();return t('Скидку можно выиграть в играх, кейсах и по промокоду. Она хранится 7 дней и применяется к цене тарифа (в «Покупке» и в окне оплаты видна цена без скидки и со скидкой). После покупки любого тарифа скидка сгорает, так что лучше брать самый выгодный тариф сразу. '+(S.discount?'У вас сейчас -'+S.discount+'%, осталось '+discLeft()+' дн.':'Сейчас скидки нет.'),'Discounts come from games, cases and promos. It is kept 7 days, applies to plan prices and burns after a plan purchase. '+(S.discount?'You have -'+S.discount+'%, '+discLeft()+' days left.':'No discount now.'))}
+  if(/пробн|trial|бесплатн|тест|попроб/.test(q)) return t('Пробный период: 3 дня, 15 ГБ, все серверы, 1 устройство. Один раз на аккаунт. Где: 🛒 Покупка → карточка «Пробный период» → «Активировать». '+(trialUsed()?'Вы его уже использовали, повторно нельзя — выберите тариф.':on&&S.tariffId!=='trial'?'Он доступен, только когда нет активной подписки.':'Вам он доступен.'),'Trial: 3 days, 15 GB, all servers, 1 device, once per account. Buy tab → Trial card.');
+  if(/как купить|хочу купить|оформ|как оплат|buy|checkout/.test(q)) return t('Как купить VPN:\n1) Внизу нажмите 🛒 Покупка\n2) Раскройте категорию (Дешёвый / Комфортный / Семейный / Прокси)\n3) Нажмите «Оформить» у нужного тарифа\n4) Оплатите — подписка включится сразу\n5) На 🏠 главной скопируйте ссылку подписки и вставьте в Happ / v2rayTun.\nНовичок? Сначала возьмите пробный период.','How to buy: 🛒 Buy → open a category → Checkout → pay → copy the link on Home into Happ/v2rayTun. New? Try the free trial first.');
+  if(/что выбрат|какой тариф|посовет|рекоменд|подскаж|подойд|what plan|recommend/.test(q)) return t('Подскажу по задаче:\n• Нужно попробовать → пробный период (3 дня, 15 ГБ)\n• 1 устройство, мало трафика → Дешёвый (35 ГБ)\n• Телефон + ПК, смотрите видео → Комфортный (безлимит, 3 устройства)\n• Вся семья → Семейный (6 устройств)\n• Нужен только Telegram → Прокси\nДолго пользуетесь — берите 2 месяца или год, выходит дешевле в месяц.','Trial to test; Budget for 1 device; Comfort for 2-3 devices unlimited; Family for 6; Proxy for Telegram only. Longer plans cost less per month.');
+  if(/не работает|не подключ|не грузит|медлен|тормоз|нет интернет|ошибк|вылетает|не открывается|slow|not working|error/.test(q)) return t('Давайте по шагам:\n1) '+st+'\n2) В приложении обновите подписку (значок обновления)\n3) Смените сервер: Нидерланды или Эстония обычно быстрее\n4) Выключите и включите VPN, перезапустите приложение\n5) Проверьте лимит устройств по тарифу\n6) Не помогло — нажмите «К специалисту», он ответит прямо здесь. Можно приложить скриншот 📎.','Steps: check plan, refresh subscription in app, switch server (NL/EE), restart VPN/app, check device limit. Still broken — tap “To specialist” (you can attach a screenshot).');
+  if(/новост|news/.test(q)) return t('Новости: ☰ меню → 📰 Новости.','News: ☰ menu → 📰 News.');
+  if(/соц|канал|тикток|tiktok|youtube|ютуб|телеграм|telegram|бот\b/.test(q)) return t('Наши соцсети: ☰ меню → 🌐 Наши соц сети (Telegram-канал, бот и TikTok). YouTube пока временно не работает.','Socials: ☰ menu → 🌐 Our socials. YouTube is temporarily unavailable.');
+  if(/барабан|тап|wheel|tap\b/.test(q)) return t('Барабан и Тап сейчас временно недоступны. Работают Полоса, Сапёр, Кейсы и Промо во вкладке 🎮 Игры.','Wheel and Tap are temporarily unavailable. Reel, Mines, Cases and Promos work.');
+  return aiReplyBase(text);
+}
+function aiReplyBase(text){
+  const q=String(text||'').toLowerCase();
+  // тарифы / цены
+  if(/тариф|цен|сколько|стоимость|комфорт|семейн|дешёв|дешев|прокси|plan|price|cost/.test(q))
+    return t('Тарифы JOD VPN:\n• Дешёвый: 13₽/день, 30₽/неделя, 65₽/мес (35 ГБ, 1 устройство, 2 DE)\n• Комфортный: 50₽/нед, 115₽/мес, 215₽/2мес, 990₽/год (безлимит, 3 устр.)\n• Семейный: 165₽/мес, 340₽/2мес, 1340₽/год (6 устр.)\n• Прокси TG: +1д 10₽, +7д 50₽, +30д 100₽, +60д 165₽\nОплата: СБП / крипта. Раздел «Покупка».','JOD VPN plans: Budget 13–65₽, Comfort 50–990₽, Family 165–1340₽, Proxy 10–165₽. Pay via SBP/crypto. See Buy.');
+  // серверы
+  if(/сервер|нидерл|эстон|польш|испан|герман|nl|ee|pl|es|de|server|локац/.test(q))
+    return t('Серверы: 4× Нидерланды, 4× Эстония, Польша, Испания, Германия + прокси. Протокол VLESS / TCP / REALITY. В приложении смените локацию, если один сервер тормозит.','Servers: 4× NL, 4× EE, PL, ES, DE + proxy. VLESS/TCP/REALITY. Switch location in the app if slow.');
+  // подключение
+  if(/подключ|как установ|прилож|happ|v2ray|incy|конфиг|vless|json|ссылк|connect|setup|install/.test(q))
+    return t('Подключение:\n1) Купите/активируйте тариф\n2) На главной: ссылка подписки / VLESS / JSON\n3) Приложения: Happ, v2rayTun, INCY\n4) Импортируйте ключ и включите VPN\nЕсли не коннектится — другой сервер или обновите подписку.','Connect: buy plan → copy sub/VLESS/JSON on Home → Happ/v2rayTun/INCY → import & enable. Try another server if needed.');
+  // оплата
+  if(/оплат|сбп|крипт|платёж|платеж|деньг|баланс|пополн|pay|card|money/.test(q))
+    return t('Оплата: СБП и крипта (демо-кнопки «прошёл/не прошёл»). Пополнение баланса — ☰ → Пополнить. Если платёж не прошёл — подождите 10–15 минут.','Pay: SBP/crypto (demo confirm). Top up via menu. If failed, wait 10–15 min.');
+  // игры
+  if(/игр|барабан|рулетк|тап|кейс|сапёр|сапер|полос|wheel|tap|case|mines|spin|крут/.test(q))
+    return t('Мини-игры → вкладка «Игры»:\n• Барабан и Тап — нужна активная подписка, режим на 24ч\n• Полоса и Сапёр — бесплатно раз в 24ч\n• Кейсы — покупка/инвентарь, открытие с лентой наград\nНаграды начисляются сразу (кейсы — в инвентарь).','Games tab: Wheel/Tap need plan; Reel/Mines free daily; Cases to inventory. Rewards apply instantly.');
+  // ивенты
+  if(/ивент|событ|event|хэлло|halloween|наград.*лвл|задани/.test(q))
+    return t('Ивенты во вкладке «Ивенты». У каждой подписки ивента свои задания и награды. До старта — «скоро», после конца — архив.','Events tab: each pass has own tasks/rewards. Upcoming / live / past.');
+  // бан мут
+  if(/бан|блок|мут|чс|забан|blocked|ban|mute/.test(q))
+    return t('Если аккаунт ограничен — напишите причину и логин. Могу подсказать, но снять бан может только администратор. Нажмите «К специалисту».','If restricted, describe the issue. Only admin can unban — tap Specialist.');
+  // промо
+  if(/промо|promo|код|start|купон/.test(q))
+    return t('Промокоды: раздел Игры → Промо (или поле активации). Пример START может давать бонус на баланс. Код одноразовый на аккаунт.','Promos in Games → Promo. Codes are usually one-time per account.');
+  // поддержка
+  if(/поддержк|оператор|человек|специалист|admin|живой/.test(q))
+    return t('Я ИИ JOD VPN. Чтобы передать живому специалисту — нажмите кнопку «К специалисту» ниже.','I am JOD VPN AI. Tap “Specialist” below for a human.');
+  // приветствие
+  if(/привет|здравств|hello|hi|добрый/.test(q))
+    return t('Здравствуйте! Я ИИ-помощник JOD VPN. Спрошу по тарифам, серверам, подключению, играм, оплате. Или нажмите «К специалисту».','Hello! JOD VPN AI — ask about plans, servers, setup, games, payments — or tap Specialist.');
+  // дефолт
+  return t('Я знаю тарифы, серверы (NL/EE/PL/ES/DE), подключение (Happ/v2rayTun/VLESS), оплату, игры, ивенты и промо. Опишите вопрос своими словами — или нажмите «К специалисту».','I know plans, servers, setup, payments, games, events, promos. Describe your question — or tap Specialist.');
+}
+
+function supportHTML(){
+  const mine=S.tickets.filter(x=>x.login===S.login);
+  const open=mine.filter(x=>x.status!=='closed');
+  const closed=mine.filter(x=>x.status==='closed');
+  // Открытый чат
+  if(S.openTicketId){
+    const tk=S.tickets.find(x=>x.id===S.openTicketId);
+    if(!tk){S.openTicketId='';}
+    else{
+      const canReply=tk.status!=='closed';
+      return `<div class="row" style="margin-bottom:12px"><button class="btn ghost" id="backTickets">← ${t('Назад','Back')}</button><b class="grow" style="text-align:center">${t('Обращение','Ticket')}</b></div>
+      <div class="card">
+        <p class="muted" style="font-size:12px">${tk.status==='closed'?t('Закрыто','Closed'):tk.status==='taken'?t('В работе: ','In progress: ')+(tk.assignee||''):t('Ждёт ответа','Waiting')}</p>
+        <div style="margin-top:10px;max-height:320px;overflow-y:auto">${(tk.thread||[]).map(m=>`
+          <div style="margin-bottom:10px;padding:10px;border-radius:12px;background:${m.from==='admin'?'var(--surface2)':'color-mix(in srgb,var(--primary) 18%, transparent)'}">
+            <div class="row" style="justify-content:space-between"><b style="font-size:12px">${m.from==='admin'?'🛠 '+m.login:m.from==='ai'?'🤖 '+m.login:'👤 '+m.login}</b><span class="muted" style="font-size:11px">${when(m.at,S.lang)}</span></div>
+            <p style="margin-top:6px;font-size:14px;white-space:pre-wrap">${esc(m.text)}</p>${m.img?`<img class="chat-img" src="${m.img}" alt="">`:''}
+          </div>`).join('')}</div>
+        ${canReply?`
+          ${(tk.mode||'ai')==='ai'?`
+          <button type="button" class="btn block" style="margin-top:12px" id="toSpecialist">👨‍💼 ${t('К специалисту','To specialist')}</button>
+          <p class="muted" style="font-size:11px;margin-top:6px">${t('Сейчас отвечает ИИ. Специалист отключит ИИ.','AI is answering. Specialist disables AI.')}</p>
+          `:`
+          <p class="muted" style="margin-top:12px;font-weight:800;color:var(--accent)">👨‍💼 ${t('ИИ отключён · ждём специалиста','AI off · waiting for specialist')}</p>
+          <button type="button" class="btn ghost block" style="margin-top:8px" id="toAI">🤖 ${t('Вернуть ИИ','Back to AI')}</button>
+          `}
+          ${(tk.mode||'ai')==='ai'?`<div class="row wrap" style="gap:6px;margin-top:10px">${[t('Как купить VPN','How to buy'),t('Какой тариф выбрать','Which plan'),t('Не подключается','Not connecting'),t('Скидка','Discount'),t('Пробный период','Trial')].map(x=>`<button type="button" class="pill" style="min-height:34px;font-size:12px" data-q="${x}">${x}</button>`).join('')}</div>`:''}
+          <textarea id="replyText" rows="2" style="margin-top:8px" placeholder="${t('Написать сообщение…','Write a message…')}"></textarea>
+          <label class="btn ghost block" style="margin-top:8px">📎 ${t('Прикрепить фото','Attach photo')}<input type="file" id="imgPick" accept="image/*" style="display:none"></label><div class="muted" id="imgNote" style="font-size:12px;margin-top:4px">${PIMG?'📷 '+t('фото прикреплено','photo attached'):''}</div>
+    <button type="button" class="btn block" style="margin-top:8px" id="sendReply">${t('Отправить','Send')}</button>
+        `:`
+          <button class="btn block" style="margin-top:12px" id="reopenTicket">${t('Открыть снова','Reopen')}</button>
+          ${tk.rating?`<p class="muted" style="margin-top:8px;text-align:center">★ ${tk.rating}/5</p>`:`
+            <p style="margin-top:10px;font-size:12px;font-weight:700;text-align:center">${t('Оцените ответ','Rate the reply')}</p>
+            <div class="row" style="justify-content:center;margin-top:6px">${[1,2,3,4,5].map(n=>`<button class="pill" data-rate="${tk.id}:${n}">☆</button>`).join('')}</div>
+          `}
+        `}
+      </div>`;
+    }
+  }
+  return `<h1 style="font-size:20px;margin-bottom:12px">${t('Поддержка','Support')}</h1>
+  <div class="card">
+    <b>${t('Создать обращение','New ticket')}</b>
+    <textarea id="ticketText" rows="3" style="margin-top:10px" placeholder="${t('Опишите проблему','Describe the issue')}"></textarea>
+    <label class="btn ghost block" style="margin-top:8px">📎 ${t('Прикрепить фото','Attach photo')}<input type="file" id="imgPick" accept="image/*" style="display:none"></label><div class="muted" id="imgNote" style="font-size:12px;margin-top:4px">${PIMG?'📷 '+t('фото прикреплено','photo attached'):''}</div>
+    <button class="btn block" style="margin-top:10px" id="sendTicket">${t('Отправить','Send')}</button>
+  </div>
+  <h3 style="font-size:13px;margin:8px 0">${t('Активные','Active')}</h3>
+  ${open.length?open.map(tk=>`
+    <button class="card" style="width:100%;text-align:left;border:1px solid var(--border);background:var(--surface);color:var(--fg)" data-open-tk="${tk.id}">
+      <b>${(tk.thread&&tk.thread[0]?tk.thread[0].text:tk.text).slice(0,80)}</b>
+      <p class="muted" style="margin-top:6px">${tk.status==='taken'?t('В работе: ','With ')+(tk.assignee||''):t('Ждёт админа','Waiting')} · ${tk.thread?tk.thread.length:0} ${t('сообщ.','msgs')}</p>
+    </button>`).join(''):`<p class="muted">${t('Пусто','Empty')}</p>`}
+  <h3 style="font-size:13px;margin:12px 0 8px">${t('Закрытые','Closed')}</h3>
+  ${closed.length?closed.map(tk=>`
+    <button class="card" style="width:100%;text-align:left;border:1px solid var(--border);background:var(--surface);color:var(--fg);opacity:.9" data-open-tk="${tk.id}">
+      <b>${(tk.thread&&tk.thread[0]?tk.thread[0].text:tk.text).slice(0,80)}</b>
+      <p class="muted" style="margin-top:6px">${when(tk.closedAt||tk.createdAt,S.lang)}${tk.rating?' · ★ '+tk.rating:''}</p>
+      <p class="muted" style="font-size:12px;margin-top:4px">${t('Нажми, чтобы открыть','Tap to open')}</p>
+    </button>`).join(''):`<p class="muted">—</p>`}`;
+}
+
+function rewardLabel(r){
+  if(!r) return '—';
+  if(typeof r==='string') return r;
+  const k=r.kind||'money', n=Number(r.amount)||0;
+  if(k==='money') return '+'+n+' ₽';
+  if(k==='days') return '+'+n+' '+t('дн.','d');
+  if(k==='spins') return '+'+n+' '+t('круток','spins');
+  if(k==='discount') return '+'+n+'%';
+  if(k==='gb') return '+'+n+' GB';
+  return (r.text||k)+' '+n;
+}
+function giveLevelReward(r){
+  if(!r) return;
+  if(typeof r==='string'){
+    const m=parseInt(String(r).replace(/\D/g,''),10)||0;
+    if(String(r).includes('%')) reward('discount',m,r);
+    else if(/gb/i.test(String(r))) reward('gb',m,r);
+    else if(/дн|day/i.test(String(r))) reward('days',m,r);
+    else if(/крут|spin/i.test(String(r))) reward('spins',m,r);
+    else if(/кейс|case/i.test(String(r))) reward('case',String(r),r);
+    else reward('money',m||0,r);
+    return;
+  }
+  const k=r.kind||'money';
+  if(k==='case'){
+    reward('case', r.caseId||r.amount||r.value||'', rewardLabel(r), {caseId:r.caseId||r.amount||r.value, from:'event'});
+  } else {
+    reward(k, Number(r.amount)||Number(r.value)||0, rewardLabel(r));
+  }
+}
+
+function fmtLeft(ms){
+  if(ms<=0) return '0';
+  const s=Math.floor(ms/1000);
+  const d=Math.floor(s/86400), h=Math.floor((s%86400)/3600), m=Math.floor((s%3600)/60);
+  if(d>0) return d+(S.lang==='ru'?' д. ':' d ')+h+(S.lang==='ru'?' ч':' h');
+  if(h>0) return h+(S.lang==='ru'?' ч ':' h ')+m+(S.lang==='ru'?' мин':' min');
+  return m+(S.lang==='ru'?' мин':' min');
+}
+function evStatus(ev){
+  const now=Date.now();
+  const start=Number(ev.start)||0, end=Number(ev.end)||0;
+  if(end && now>=end) return 'past';
+  if(start && now<start) return 'soon';
+  return 'live';
+}
+function eventsHTML(){
+  const soon=S.events.filter(e=>evStatus(e)==='soon');
+  const live=S.events.filter(e=>evStatus(e)==='live');
+  const past=S.events.filter(e=>evStatus(e)==='past');
+  if(!soon.length&&!live.length&&!past.length){
+    return `<h1 style="font-size:20px;margin-bottom:12px">${t('Ивенты','Events')}</h1>
+    <div class="card" style="text-align:center;padding:28px 16px">
+      <div style="font-size:40px;margin-bottom:8px">🎉</div>
+      <b>${t('Пока эвентов нет','No events yet')}</b>
+      <p class="muted" style="margin-top:8px">${t('Когда админ запустит ивент — он появится здесь','When admin starts an event it will show up here')}</p>
+    </div>`;
+  }
+  const themeBg={
+    halloween:'linear-gradient(160deg,#1a0a05,#2d1508 40%,#0d0d12)',
+    winter:'linear-gradient(160deg,#0a1628,#123050 50%,#0d1a2a)',
+    summer:'linear-gradient(160deg,#0c2a2a,#1a4d4a 45%,#0d1a18)',
+    autumn:'linear-gradient(160deg,#2a1408,#5c2e12 45%,#1a1008)',
+    spring:'linear-gradient(160deg,#122018,#2a4a38 45%,#0e1a14)',
+    newyear:'linear-gradient(160deg,#1a0a28,#3b1a5c 45%,#0d1020)',
+    other:'linear-gradient(160deg,color-mix(in srgb,var(--primary) 30%,var(--surface)),var(--surface))',
+    default:'linear-gradient(160deg,color-mix(in srgb,var(--primary) 25%,var(--surface)),var(--surface))'
+  };
+  const themeEmoji={halloween:'🎃',winter:'❄️',summer:'☀️',autumn:'🍂',spring:'🌸',newyear:'🎄',other:'🎭',default:'✨'};
+  let out=`<h1 style="font-size:20px;margin-bottom:12px">${t('Ивенты','Events')}</h1>`;
+  const renderEv=(ev,st)=>{
+    const joined=S.progress&&S.progress.eventId===ev.id?S.progress:null;
+    const pass=joined?(ev.passes||[]).find(p=>p.id===joined.passId):null;
+    const levels=pass?(pass.levels||[]):[];
+    const tasks=pass?(pass.tasks||[]):[];
+    const maxLvl=levels.length?Math.max(...levels.map(l=>l.level)):0;
+    const bg=themeBg[ev.theme]||themeBg.default;
+    const emo=themeEmoji[ev.theme]||themeEmoji.default;
+    const now=Date.now();
+    let body=`<div class="card" style="padding:0;overflow:hidden;${st==='past'?'opacity:.75':''}">
+      <div style="background:${bg};padding:16px;color:#fff">
+        <div class="row" style="justify-content:space-between">
+          <span style="font-size:28px">${emo}</span>
+          <span class="chip" style="background:rgba(255,255,255,.15);color:#fff">${ev.theme}</span>
+        </div>
+        <h2 style="margin:8px 0 4px;font-size:20px">${ev.name}</h2>
+        <p style="font-size:12px;opacity:.85">${when(ev.start,S.lang)} — ${when(ev.end,S.lang)}</p>`;
+    if(st==='soon') body+=`<p style="margin-top:10px;font-weight:800;font-size:14px">⏳ ${t('Скоро начнётся','Starts soon')}: ${fmtLeft(Number(ev.start)-now)}</p>`;
+    else if(st==='live') body+=`<p style="margin-top:10px;font-weight:800;font-size:13px;opacity:.9">⏱ ${t('До конца','Ends in')}: ${fmtLeft(Number(ev.end)-now)}</p>`;
+    else body+=`<p style="margin-top:6px;font-size:12px;opacity:.7">${t('Завершён','Ended')}</p>`;
+    body+=`</div><div style="padding:14px">`;
+    if(st==='soon'){
+      body+=`<p class="muted" style="margin-bottom:10px">${t('У каждой подписки свои задания и награды','Each pass has its own tasks and rewards')}</p>`;
+      body+=(ev.passes||[]).map(p=>`
+        <div style="margin-top:10px;padding:12px;border-radius:12px;background:var(--surface2);border-left:4px solid ${p.color}">
+          <div class="row" style="justify-content:space-between"><b>${p.name}</b><span>${p.price===0?t('бесплатно','free'):money(p.price)}</span></div>
+          <div class="muted" style="font-size:11px;margin-top:6px">${(p.levels||[]).length} LVL · ${(p.tasks||[]).length} ${t('заданий','tasks')}</div>
+          <div style="margin-top:6px">${(p.levels||[]).map(l=>`<span class="chip">LVL ${l.level}: ${rewardLabel(l.reward)}</span>`).join('')}</div>
+        </div>`).join('');
+    } else if(joined&&pass&&st==='live'){
+      const lvl=joined.level||0;
+      const pct=maxLvl?Math.min(100,Math.round(lvl/maxLvl*100)):0;
+      body+=`<div class="row" style="justify-content:space-between;margin-bottom:10px">
+        <span class="chip" style="background:${pass.color};color:#111">${pass.name}</span>
+        <b>LVL ${lvl}${maxLvl?' / '+maxLvl:''}</b>
+      </div>
+      <div style="height:8px;border-radius:999px;background:var(--surface2);overflow:hidden;margin-bottom:14px">
+        <div style="height:100%;width:${pct}%;background:${pass.color};border-radius:999px"></div>
+      </div>
+      <b style="font-size:13px">${t('Награды подписки','Pass rewards')}</b>
+      <div style="margin:8px 0 14px">${levels.map(l=>{
+        const got=lvl>=l.level;
+        return `<div class="row" style="justify-content:space-between;padding:8px 10px;margin-top:6px;border-radius:10px;background:var(--surface2);opacity:${got?1:.55}">
+          <span><b>LVL ${l.level}</b> · ${rewardLabel(l.reward)}</span><span>${got?'✅':'🔒'}</span>
+        </div>`;
+      }).join('')||'<p class="muted">—</p>'}</div>
+      <b style="font-size:13px">${t('Задания подписки','Pass tasks')}</b>
+      <div style="margin-top:8px">${tasks.map((task,i)=>{
+        const open=now>=Number(ev.start)+i*DAY;
+        const done=(joined.done||[]).includes(task.id);
+        const need=task.amount?` · ${task.amount}`:'';
+        return `<div style="margin-top:8px;padding:12px;border-radius:12px;background:var(--surface2);border:1px solid ${done?'var(--ok)':'var(--border)'}">
+          <div class="row" style="justify-content:space-between;gap:8px">
+            <div class="grow">
+              <div style="font-weight:800;font-size:13px">${i+1}. ${task.text}</div>
+              <div class="muted" style="font-size:11px;margin-top:4px">${task.kind||''}${need} · ${open?t('доступно','open'):t('откроется позже','locked')}</div>
+            </div>
+            <button class="btn ${done?'ghost':''}" style="min-height:36px;padding:0 12px" data-task="${task.id}" ${!open||done?'disabled':''}>${done?'✓':open?t('Готово','Done'):'⏳'}</button>
+          </div>
+        </div>`;
+      }).join('')||`<p class="muted">${t('Нет заданий','No tasks')}</p>`}</div>`;
+    } else if(st==='live'){
+      body+=`<b style="font-size:13px">${t('Выберите подписку','Choose a pass')}</b>
+      <p class="muted" style="font-size:12px;margin:6px 0 8px">${t('У каждой — свои задания и награды','Each has its own tasks and rewards')}</p>
+      ${(ev.passes||[]).map(p=>`
+        <div style="margin-top:10px;padding:12px;border-radius:12px;background:var(--surface2);border-left:4px solid ${p.color}">
+          <div class="row" style="justify-content:space-between;margin-bottom:8px">
+            <b>${p.name}</b><span>${p.price===0?t('бесплатно','free'):money(p.price)}</span>
+          </div>
+          <div class="muted" style="font-size:11px;margin-bottom:8px">${(p.levels||[]).length} LVL · ${(p.tasks||[]).length} ${t('заданий','tasks')}</div>
+          <div style="margin-bottom:8px">${(p.levels||[]).map(l=>`<span class="chip">LVL ${l.level}: ${rewardLabel(l.reward)}</span>`).join('')}</div>
+          <button class="btn block" style="background:${p.color};color:#111" data-pass="${ev.id}:${p.id}">${t('Выбрать','Select')}</button>
+        </div>`).join('')}`;
+    } else {
+      body+=`<p class="muted">${t('Ивент завершён','Event ended')}</p>`;
+      if(joined&&pass) body+=`<p class="muted" style="margin-top:6px">${pass.name} · LVL ${joined.level||0}</p>`;
+    }
+    body+=`</div></div>`;
+    return body;
+  };
+  if(live.length){ out+=`<h3 style="font-size:13px;margin:0 0 8px">${t('Идут сейчас','Live')}</h3>`; live.forEach(ev=>{out+=renderEv(ev,'live')}); }
+  if(soon.length){ out+=`<h3 style="font-size:13px;margin:12px 0 8px">${t('Скоро','Upcoming')}</h3>`; soon.forEach(ev=>{out+=renderEv(ev,'soon')}); }
+  if(past.length){ out+=`<h3 style="font-size:13px;margin:12px 0 8px">${t('Прошедшие','Past')}</h3>`; past.forEach(ev=>{out+=renderEv(ev,'past')}); }
+  return out;
+}
+
+function getShopCases(){
+  const base=CASES.map(c=>({...c,emoji:c.id==='c25'?'🥉':c.id==='c50'?'🥈':'🥇',name:c.ru,shop:true,desc:'',color1:c.id==='c25'?'#92400e':c.id==='c50'?'#6b7280':'#a16207',color2:c.id==='c25'?'#f59e0b':c.id==='c50'?'#e5e7eb':'#fde047'}));
+  const custom=(S.customCases||[]).filter(c=>c.shop!==false);
+  return [...base,...custom];
+}
+function getCaseById(id){
+  const key=String(id||'').trim();
+  if(!key) return null;
+  return getShopCases().find(c=>String(c.id)===key)||(S.customCases||[]).find(c=>String(c.id)===key)||null;
+}
+function gamesHTML(){
+  if((S.offGames||[]).includes(S.gameScreen))S.gameScreen=null;
+  if(S.noGames||(S.people.find(p=>p.login===S.login)||{}).noGames){
+    return `<div class="card" style="text-align:center;padding:28px"><div style="font-size:40px">🚫</div><b>${t('Игры запрещены','Games forbidden')}</b></div>`;
+  }
+  if(!S.gameScreen){
+    const cards=[
+      {id:'wheel',ava:'🎰',ru:'Барабан',en:'Wheel',need:true},
+      {id:'tap',ava:'👆',ru:'Тапать',en:'Tap',need:true},
+      {id:'slot',ava:'↕️',ru:'Полоса',en:'Reel',need:false},
+      {id:'mines',ava:'💣',ru:'Сапёр',en:'Mines',need:false},
+      {id:'cases',ava:'📦',ru:'Кейсы',en:'Cases',need:false},
+      {id:'promo',ava:'🎟',ru:'Промо',en:'Promos',need:false},
+    ];
+    return `<h1 style="font-size:20px;margin-bottom:6px">${t('Мини-игры','Mini-games')}</h1>
+    <p class="muted" style="margin-bottom:12px;font-size:12px">${t('Выберите игру','Pick a game')}</p>
+    <div class="row wrap" style="gap:10px">
+      ${cards.map(c=>`
+        <button type="button" class="game-card ${(S.offGames||[]).includes(c.id)?'off':''}" ${(S.offGames||[]).includes(c.id)?'data-off="1"':'data-open-game="'+c.id+'"'}>
+          <div class="game-ava">${c.ava}</div>
+          <div style="font-weight:900">${S.lang==='ru'?c.ru:c.en}</div>
+          <div class="muted" style="font-size:11px;margin-top:4px">${c.need?t('нужен тариф','plan required'):t('бесплатно','free')}</div>
+          <div class="btn" style="margin-top:10px;min-height:36px;width:100%;font-size:11px">${(S.offGames||[]).includes(c.id)?'🚧 '+t('Временно недоступно','Temporarily unavailable'):t('Играть','Play')}</div>
+        </button>
+      `).join('')}
+    </div>`;
+  }
+  const back=`<div class="row" style="margin-bottom:12px"><button type="button" class="btn ghost" id="backGames">← ${t('К играм','Games')}</button></div>`;
+  if(S.gameScreen==='wheel') return back+wheelHTML();
+  if(S.gameScreen==='tap') return back+tapHTML();
+  if(S.gameScreen==='slot') return back+slotHTML();
+  if(S.gameScreen==='mines') return back+minesHTML();
+  if(S.gameScreen==='cases') return back+casesHTML();
+  if(S.gameScreen==='promo') return back+promoHTML();
+  return back;
+}
+function wheelHTML(){
+  const ok=active();
+  const pool=wheelPool();
+  const dual=S.dualUntil>Date.now();
+  const left=Math.max(0,DAY-(Date.now()-(S.lastWheel||0)));
+  const blocked=(!dual && S.mode==='tap' && S.modeLock>Date.now());
+  const onCooldown=!((S.freeSpins||0)>0) && left>0;
+  const can=ok&&!S.spinning&&((S.freeSpins||0)>0||left<=0)&&!blocked;
+  const unavailable=!ok || blocked || onCooldown;
+
+  if(unavailable && !S.spinning){
+    let reason='';
+    if(!ok) reason=t('Нужна активная подписка','Active plan required');
+    else if(blocked) reason=t('Сейчас режим тапа — барабан недоступен 24ч','Tap mode — wheel locked 24h');
+    else if(onCooldown) reason=t('Пока недоступно','Not available yet')+' · ⏱ '+fmtLeft(left);
+    return `<div class="card" style="text-align:center;padding:28px 16px">
+      <div class="game-ava" style="opacity:.45;margin-bottom:10px">🎰</div>
+      <h2 style="font-size:18px;margin-bottom:8px">${t('Барабан','Wheel')}</h2>
+      <p style="font-weight:900;font-size:16px;color:var(--accent);margin:12px 0">${t('Пока недоступно','Not available yet')}</p>
+      <p class="muted" style="font-size:13px;line-height:1.4">${reason}</p>
+      ${!ok?`<button type="button" class="btn block" style="margin-top:16px" data-tab-go="buy">${t('Купить тариф','Buy plan')}</button>`:''}
+      ${(S.freeSpins||0)>0?`<p class="muted" style="margin-top:10px">${t('Есть бесплатные крутки — подождите сброс режима','Free spins wait mode reset')}</p>`:''}
+      <button type="button" class="btn ghost block" style="margin-top:12px" id="backGames">← ${t('К играм','Games')}</button>
+    </div>`;
+  }
+
+  const strip=[...pool,...pool,...pool,...pool];
+  return `<div class="card" style="text-align:center">
+    <div class="game-ava" style="margin-bottom:8px">🎰</div>
+    <h2 style="font-size:18px;margin-bottom:4px">${t('Барабан','Wheel')}</h2>
+    <p class="muted" style="font-size:12px">${t('Сверху вниз. Нужен тариф.','Top→bottom. Plan required.')}</p>
+    <div class="row" style="justify-content:center;gap:8px;margin:12px 0;flex-wrap:wrap">
+      <span class="chip">${t('крутки','spins')}: ${S.freeSpins||0}</span>
+      <span class="chip">${S.mode?t('режим','mode')+': '+S.mode:'—'}</span>
+    </div>
+    <div class="v-reel" id="vReel">
+      <div class="v-reel-pointer"></div>
+      <div class="v-reel-track" id="vTrack" style="transform:translateY(${S.vReelY||0}px)">
+        ${strip.map((x,i)=>`<div class="v-reel-item" style="background:${x.k==='none'?'var(--surface2)':['#1d4ed8','#0f766e','#b45309','#6d28d9','#be123c'][i%5]};color:#fff">${x.l}</div>`).join('')}
+      </div>
+    </div>
+    <div style="margin-top:10px">${pool.map(x=>`<span class="chip">${x.l}</span>`).join('')}</div>
+    <button type="button" class="btn block" style="margin-top:12px" id="spinBtn" ${!can?'disabled':''}>${S.spinning?t('Крутится…','Spinning…'):t('Крутить','Spin')}</button>
+  </div>`;
+}
+function tapHTML(){
+  const ok=active();
+  const lim=tapLimit()||0;
+  const dual=S.dualUntil>Date.now();
+  return `<div class="card" style="text-align:center">
+    <div class="game-ava">👆</div>
+    <h2 style="font-size:18px;margin:8px 0 4px">${t('Тапать','Tap')}</h2>
+    <p class="muted" style="font-size:12px">${t('Нужен тариф. Лимит тапов по тарифу. Барабан и тап — разные режимы 24ч.','Plan required. Tap limit by plan. Wheel/tap exclusive 24h.')}</p>
+    ${!ok?`<p style="margin-top:12px;color:var(--danger);font-weight:800">${t('Нужна активная подписка','Active plan required')}</p>
+      <button type="button" class="btn block" style="margin-top:10px" data-tab-go="buy">${t('Купить тариф','Buy plan')}</button>`:`
+      <p class="muted" style="margin-top:10px">${S.tapsToday||0} / ${lim}</p>
+      ${(!dual && S.mode==='wheel' && S.modeLock>Date.now())?`<p style="color:var(--accent);font-weight:800">${t('Сейчас режим барабана — тап через 24ч','Wheel mode — tap in 24h')}</p>`:`<button type="button" class="tap-btn" id="tapBtn" style="animation:glow 2s infinite">TAP</button>`}
+      <p style="min-height:24px;font-weight:900;color:var(--accent)">${S.floatTap||''}</p>
+    `}
+  </div>`;
+}
+function slotHTML(){
+  const left=Math.max(0,DAY-(Date.now()-(S.lastSlot||0)));
+  return `<div class="card" style="text-align:center">
+    <div class="game-ava">↕️</div>
+    <h2 style="font-size:18px;margin:8px 0 4px">${t('Полоса','Reel')}</h2>
+    <p class="muted" style="font-size:12px">${t('Бесплатно раз в 24 часа. Сколько выпало — столько ₽.','Free once / 24h. Result = ₽ amount.')}</p>
+    ${left>0?`<span class="chip">⏱ ${fmtLeft(left)}</span>`:''}
+    <div class="v-reel" style="margin-top:12px" id="slotReel">
+      <div class="v-reel-pointer"></div>
+      <div class="v-reel-track" id="slotTrack" style="transform:translateY(${S.slotY||0}px)">
+        ${['+1 ₽','+3 ₽','+5 ₽','+10 ₽','+50 ₽','+100 ₽','+1 ₽','+3 ₽','+5 ₽','+10 ₽','+50 ₽','+100 ₽','+1 ₽','+3 ₽','+5 ₽','+10 ₽','+50 ₽','+100 ₽'].map((x,i)=>`<div class="v-reel-item" style="background:${['#334155','#1d4ed8','#0f766e','#b45309','#7c3aed','#be123c'][i%6]};color:#fff">${x}</div>`).join('')}
+      </div>
+    </div>
+    <button type="button" class="btn block" style="margin-top:12px" id="slotBtn" ${left>0||S.spinning?'disabled':''}>${t('Крутить','Spin')}</button>
+    ${S.slotText?`<p style="margin-top:10px;font-weight:900;color:var(--accent)">${S.slotText}</p>`:''}
+  </div>`;
+}
+function minesHTML(){
+  const cells=S.mines||Array.from({length:30},()=>null);
+  const left=Math.max(0,DAY-(Date.now()-(S.lastMines||0)));
+  return `<div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px">
+      <div>
+        <div class="row" style="gap:8px"><div class="game-ava" style="width:40px;height:40px;font-size:18px;border-radius:12px">💣</div>
+        <div><b>${t('Сапёр','Mines')}</b><div class="muted" style="font-size:11px">5×6 · 3 ${t('попытки','tries')}</div></div></div>
+      </div>
+      <div style="text-align:right">
+        <b>${S.minesLives||0}/3</b>
+        ${left>0&&S.minesDone?`<div class="muted" style="font-size:11px">⏱ ${fmtLeft(left)}</div>`:''}
+      </div>
+    </div>
+    <div class="grid5">${cells.map((c,i)=>{
+      if(!c||!c.open) return `<button type="button" class="cell" data-cell="${i}"></button>`;
+      const cls=c.kind==='bomb'?'open-bomb':c.kind==='reward'?'open-reward':'open-empty';
+      const txt=c.kind==='bomb'?'×':c.kind==='reward'?(c.label||'!'):'·';
+      return `<button type="button" class="cell ${cls}" disabled>${txt}</button>`;
+    }).join('')}</div>
+    <button type="button" class="btn ghost block" style="margin-top:12px" id="newMines">${t('Новое поле','New field')}</button>
+  </div>`;
+}
+function casesHTML(){
+  if(S.caseView){
+    const c=getCaseById(S.caseView);
+    if(!c){S.caseView=null}
+    else{
+      const drops=c.drops||[];
+      return `<div class="card" style="text-align:center">
+        <div class="case-img" style="width:96px;height:96px;font-size:42px;margin-bottom:10px">${c.emoji||'📦'}</div>
+        <h2 style="font-size:18px">${c.ru||c.name}</h2>
+        <p class="muted" style="font-size:12px;margin:6px 0">${c.desc||''}</p>
+        <div style="margin:10px 0">${drops.map(d=>`<span class="chip">${d.l||rewardLabel(d)} · ${d.w||0}%</span>`).join('')}</div>
+        ${S.caseOpening?`
+        <p class="muted" style="margin-bottom:8px">${t('Крутим награды…','Spinning rewards…')}</p>
+        <div style="position:relative;height:88px;overflow:hidden;border-radius:16px;border:2px solid var(--accent);background:var(--surface2);margin:8px 0 12px">
+          <div style="position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--accent);z-index:2;transform:translateX(-50%)"></div>
+          <div id="caseReelTrack" style="display:flex;align-items:center;height:100%;will-change:transform">
+            ${(S.caseReel||[]).map(it=>`
+              <div style="flex:0 0 72px;height:72px;margin:0 0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                <div style="font-size:28px;line-height:1">${it.icon||'🎁'}</div>
+                <div style="font-size:9px;font-weight:700;opacity:.85;max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${it.l||''}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        `:''}
+        ${S.caseResult?`<p class="prize-pop" style="font-weight:900;font-size:22px;color:var(--accent);margin:12px 0">🎁 ${S.caseResult}</p>`:''}
+        <button type="button" class="btn block" id="openThisCase" ${S.caseOpening?'disabled':''}>${t('Открыть','Open')}</button>
+        <button type="button" class="btn ghost block" style="margin-top:8px" id="closeCaseView">${t('Назад','Back')}</button>
+      </div>`;
+    }
+  }
+  const shop=getShopCases();
+  return `
+  <h2 style="font-size:16px;margin-bottom:8px">🛒 ${t('Магазин кейсов','Case shop')}</h2>
+  <div class="case-grid">${shop.map(c=>{
+    const price=Math.max(1,Math.round((c.price||0)*(1-(S.discount||0)/100)));
+    return `<div class="case-tile">
+      <div class="case-img" style="background:linear-gradient(145deg,${c.color1||'#1d4ed8'},${c.color2||'#7c3aed'});font-size:36px;width:88px;height:88px">${c.emoji||'📦'}</div>
+      <b style="font-size:13px">${c.ru||c.name}</b>
+      <div class="muted" style="font-size:11px;margin:4px 0">${money(price)}</div>
+      <button type="button" class="btn" style="min-height:34px;width:100%;margin-top:6px" data-buy-case="${c.id}">${t('Купить','Buy')}</button>
+      <button type="button" class="btn ghost" style="min-height:30px;width:100%;margin-top:4px;font-size:11px" data-preview-case="${c.id}">${t('Что внутри','Loot')}</button>
+    </div>`;
+  }).join('')||`<p class="muted">${t('Пусто','Empty')}</p>`}</div>
+
+  <h2 style="font-size:16px;margin:16px 0 8px">🎒 ${t('Ваши кейсы','Your cases')}</h2>
+  <div class="case-grid">${(S.myCases||[]).length?(S.myCases||[]).map((mc,idx)=>`
+    <button type="button" class="case-tile" data-open-inv="${idx}">
+      <div class="case-img" style="background:linear-gradient(145deg,${mc.color1||'#1d4ed8'},${mc.color2||'#7c3aed'});font-size:36px;width:88px;height:88px">${mc.emoji||'📦'}</div>
+      <b style="font-size:13px">${mc.ru||mc.name}</b>
+      <div class="muted" style="font-size:11px;margin-top:4px">${t('нажми открыть','tap to open')}</div>
+    </button>`).join(''):`<p class="muted">${t('Нет кейсов. Купите или выбейте в ивенте / промо.','No cases. Buy or get from event / promo.')}</p>`}</div>`;
+}
+function promoHTML(){return`<div class="card"><input id="promoCode" placeholder="START"><button class="btn block" style="margin-top:10px" id="redeemBtn">${t('Активировать','Redeem')}</button></div><h3 style="font-size:13px;margin:8px 0">${t('История','History')}</h3>${S.promoHistory.length?S.promoHistory.map(h=>`<div class="card"><b>${h.code}</b><p class="muted">${when(h.at,S.lang)} · ${h.effect}</p></div>`).join(''):'<p class="muted">—</p>'}`}
+function drawerHTML(){
+  const page=S.menuPage||'main';
+  const themes=[['blue',t('Синяя','Blue')],['purple',t('Фиолетовая','Purple')],['black',t('Чёрная','Black')],['white',t('Белая','White')],['gray',t('Серая','Gray')]];
+  let body='';
+  if(page==='main'){
+    body=`
+      <div class="row" style="justify-content:space-between;margin-bottom:12px">
+        <div>
+          <b style="font-size:18px">${S.login}${S.adminRole==='senior'?' 👑👑👑':(S.isAdmin?' 👑':'')}</b>
+          ${(S.people.find(p=>p.login===S.login)||{}).blue?`<div style="font-size:11px;color:#3b82f6;font-weight:800;margin-top:2px">🔵 ${t('Синий статус','Blue status')}</div>`:''}
+        </div>
+        <button type="button" class="pill" id="closeDrawer">${t('Закрыть','Close')}</button>
+      </div>
+      <div class="card">
+        <div class="muted" style="font-size:11px;font-weight:800">${t('БАЛАНС','BALANCE')}</div>
+        <div style="font-size:26px;font-weight:900;margin:4px 0">${money(S.balance)}</div>
+        <button type="button" class="btn block" id="openTopup">💳 ${t('Пополнить','Top up')}</button>
+      </div>
+      <button type="button" class="btn ghost block" style="margin-top:8px;justify-content:flex-start" data-menu="stats">📊 ${t('Статистика','Statistics')}</button>
+      <button type="button" class="btn ghost block" style="margin-top:6px;justify-content:flex-start" data-menu="history">🧾 ${t('История покупок','Purchase history')}</button>
+      <button type="button" class="btn ghost block" style="margin-top:6px;justify-content:flex-start" data-menu="about">ℹ️ ${t('О сайте','About')}</button>
+      <button type="button" class="btn ghost block" style="margin-top:6px;justify-content:flex-start" data-menu="settings">⚙️ ${t('Настройки','Settings')}</button>
+      <button type="button" class="btn ghost block" style="margin-top:6px;justify-content:flex-start" data-menu="news">📰 ${t('Новости','News')}</button>
+      <button type="button" class="btn ghost block" style="margin-top:6px;justify-content:flex-start" data-menu="social">🌐 ${t('Наши соц сети','Our socials')}</button>
+      <button type="button" class="btn ghost block" style="margin-top:6px;justify-content:flex-start" data-menu="docs">📄 ${t('Документы','Documents')}</button>
+      ${S.isAdmin?`<button type="button" class="btn block" style="margin-top:12px" id="openAdmin">${t('Админ-панель','Admin')}${S.adminRole==='senior'?' 👑👑👑':''}</button>
+      <button type="button" class="btn ghost block" style="margin-top:8px" id="exitAdminRole">${t('Снять права админа','Drop admin role')}</button>`:''}
+      <button type="button" class="btn danger block" style="margin-top:12px" id="logoutBtn">${t('Выйти','Log out')}</button>`;
+  } else if(page==='topup'){
+    body=`<div class="row" style="margin-bottom:12px;gap:8px"><button type="button" class="btn ghost" data-menu="main">←</button><b>${t('Пополнение','Top up')}</b></div>
+      <button type="button" class="btn block" id="openTopup">💳 ${t('Открыть пополнение','Open top-up')}</button>`;
+  } else if(page==='stats'){
+    const st=S.stats||{};
+    body=`
+      <div class="row" style="margin-bottom:12px;gap:8px">
+        <button type="button" class="btn ghost" data-menu="main">←</button>
+        <b>${t('Статистика','Statistics')}</b>
+      </div>
+      <div class="card">
+        <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>${t('Баланс','Balance')}</span><b>${money(S.balance)}</b></div>
+        <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>${t('Скидка','Discount')}</span><b>${S.discount||0}%${S.discount?' · '+discLeft()+' '+t('дн.','d'):''}</b></div>
+        <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>${t('Трафик','Traffic')}</span><b>${(S.gb||0).toFixed(1)} GB</b></div>
+        <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>${t('Круток барабана','Wheel spins')}</span><b>${st.spins||0}</b></div>
+        <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>${t('Тапов','Taps')}</span><b>${st.taps||0}</b></div>
+        <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>${t('Полос','Reels')}</span><b>${st.slots||0}</b></div>
+        <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>${t('Сапёр','Mines')}</span><b>${st.mines||0}</b></div>
+        <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>${t('Кейсов открыто','Cases opened')}</span><b>${st.cases||0}</b></div>
+        <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>${t('Потрачено','Spent')}</span><b>${money(st.spent||0)}</b></div>
+        <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>${t('Беспл. крутки','Free spins')}</span><b>${S.freeSpins||0}</b></div>
+        <div class="row" style="justify-content:space-between;padding:8px 0"><span>${t('Кейсов в инвентаре','Cases in bag')}</span><b>${(S.myCases||[]).length}</b></div>
+      </div>
+      <div class="card">
+        <b>${t('Последние награды','Recent rewards')}</b>
+        ${(S.rewards||[]).slice(0,12).map(r=>`<div class="muted" style="font-size:12px;margin-top:6px">${r.applied===false?'⚠️':'✅'} ${r.name} · ${when(r.at,S.lang)}</div>`).join('')||`<p class="muted" style="margin-top:8px">—</p>`}
+      </div>`;
+  } else if(page==='history'){
+    const hist=S.purchaseHistory||[];
+    body=`
+      <div class="row" style="margin-bottom:12px;gap:8px">
+        <button type="button" class="btn ghost" data-menu="main">←</button>
+        <b>${t('История покупок','Purchase history')}</b>
+      </div>
+      ${hist.length?hist.map(h=>`
+        <div class="card">
+          <div class="row" style="justify-content:space-between">
+            <b style="font-size:13px">${h.title}</b>
+            <span style="font-weight:800;color:${h.ok?'var(--ok)':'var(--danger)'}">${h.ok?money(h.amount):'—'}</span>
+          </div>
+          <div class="muted" style="font-size:11px;margin-top:4px">${h.kind} · ${when(h.at,S.lang)}</div>
+          ${h.note?`<div class="muted" style="font-size:11px;margin-top:2px">${h.note}</div>`:''}
+        </div>`).join(''):`<div class="card"><p class="muted">${t('Пока пусто','Empty yet')}</p></div>`}`;
+  } else if(page==='about'){
+    body=`
+      <div class="row" style="margin-bottom:12px;gap:8px">
+        <button type="button" class="btn ghost" data-menu="main">←</button>
+        <b>${t('О сайте','About')}</b>
+      </div>
+      <div class="card">
+        <div class="brand" style="font-size:22px;margin-bottom:8px">JOD <span>VPN</span></div>
+        <p class="muted" style="font-size:13px;line-height:1.5">${t(
+          'Личный кабинет JOD VPN: тарифы, серверы VLESS Reality, мини-игры, ивенты и поддержка. Оплата в демо-режиме — без реальной платёжки.',
+          'JOD VPN cabinet: plans, VLESS Reality servers, mini-games, events and support. Demo payments — no real gateway yet.'
+        )}</p>
+        <div class="meta" style="margin-top:12px">
+          <span>Telegram: @JODVPN_bot</span>
+          <span>@JOD_VPN</span>
+          <span>@AAAP4GPMX</span>
+        </div>
+      </div>
+      <div class="card">
+        <b>${t('Серверы','Servers')}</b>
+        <p class="muted" style="font-size:12px;margin-top:6px">NL×4 · EE×4 · PL · ES · DE · Proxy</p>
+        <p class="muted" style="font-size:12px">VLESS / TCP / REALITY</p>
+      </div>`;
+  } else if(page==='settings'){
+    body=`
+      <div class="row" style="margin-bottom:12px;gap:8px">
+        <button type="button" class="btn ghost" data-menu="main">←</button>
+        <b>${t('Настройки','Settings')}</b>
+      </div>
+      <div class="card">
+        <label class="row" style="justify-content:space-between"><span>${t('Звук','Sound')}</span><input type="checkbox" id="soundChk" ${S.sound?'checked':''}></label>
+        <label class="row" style="justify-content:space-between;margin-top:12px"><span>🪟 ${t('Стекло','Glass')}</span><input type="checkbox" id="glassChk" ${S.glass?'checked':''}></label>
+        <div class="row wrap" style="margin-top:10px">
+          <button type="button" class="btn ${S.lang==='ru'?'':'ghost'}" id="langRu">RU</button>
+          <button type="button" class="btn ${S.lang==='en'?'':'ghost'}" id="langEn">EN</button>
+          <button type="button" class="btn ${S.light?'accent':'ghost'}" id="lightBtn">${S.light?'☀':'☾'}</button>
+        </div>
+        <div class="row wrap" style="margin-top:10px">${themes.map(([id,l])=>`<button type="button" class="pill" data-theme="${id}" style="${S.theme===id?'background:var(--primary);color:var(--primary-fg)':''}">${l}</button>`).join('')}</div>
+        <div class="row" style="margin-top:10px;gap:8px"><button type="button" class="pill" data-theme="custom" style="${S.theme==='custom'?'background:var(--primary);color:var(--primary-fg)':''}">🎨 ${t('Своя тема','Custom')}</button><input type="color" id="customColor" value="${S.customColor||'#ec4899'}" style="width:64px;height:44px"><span class="muted" style="font-size:12px">${t('любой цвет','any colour')}</span></div>
+        <input id="renameField" value="${S.login}" style="margin-top:12px">
+        <button type="button" class="btn ghost block" style="margin-top:8px" id="renameBtn">${t('Сменить логин','Change login')}</button>
+      </div>`;
+  } else if(page==='news'){
+    body=newsHTML();
+  } else if(page==='social'){
+    body=`<div class="row" style="margin-bottom:12px;gap:8px"><button type="button" class="btn ghost" data-menu="main">←</button><b>🌐 ${t('Наши соц сети','Our socials')}</b></div>${SOCIALS.map(x=>x.off?`<div class="soc off"><span style="font-size:24px">${x.ic}</span><span>${x.n}<small>${t('Временно не работает','Temporarily unavailable')}</small></span></div>`:`<a class="soc" href="${x.u}" target="_blank" rel="noopener"><span style="font-size:24px">${x.ic}</span><span>${S.lang==='ru'?x.n:x.en}<small>${x.sh}</small></span></a>`).join('')}`;
+  } else if(page==='docs'){
+    body=`
+      <div class="row" style="margin-bottom:12px;gap:8px">
+        <button type="button" class="btn ghost" data-menu="main">←</button>
+        <b>${t('Документы','Documents')}</b>
+      </div>
+      <div class="card">${DOCS.map(d=>`<a href="${d.href}" target="_blank" rel="noopener" style="display:block;margin:10px 0;font-weight:700">${S.lang==='ru'?d.ru:d.en}</a>`).join('')}</div>`;
+  }
+  return `<div class="drawer-bg" id="drawerBg"><aside class="drawer" id="drawerPanel">${body}</aside></div>`;
+}
+function topupHTML(){
+  return `<div class="modal-bg" id="topupModalBg" style="place-items:center;padding:16px">
+    <div class="modal card" style="margin:0" id="topupModalBox">
+      <div class="row" style="justify-content:space-between;margin-bottom:8px">
+        <h2 style="font-size:18px">💳 ${t('Пополнение','Top up')}</h2>
+        <button type="button" class="pill" id="topupClose">✕</button>
+      </div>
+      <p class="muted" style="font-size:12px">${t('Баланс','Balance')}: <b>${money(S.balance)}</b></p>
+      <p class="muted" style="margin:12px 0 6px;font-size:12px">${t('Введите сумму или выберите','Enter or pick amount')}</p>
+      <div class="row wrap" style="gap:8px;margin-bottom:12px">
+        ${[50,100,200,300,500,1000,2000].map(n=>`
+          <button type="button" class="btn ghost" data-amt="${n}" style="min-width:72px">${n} ₽</button>
+        `).join('')}
+      </div>
+      <input id="topupCustom" type="text" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="false"
+        placeholder="${t('Своя сумма','Custom amount')}"
+        style="font-size:22px;font-weight:900;text-align:center;letter-spacing:1px;padding:16px;touch-action:manipulation">
+      <p id="topupPreview" style="text-align:center;margin:12px 0;font-weight:900;font-size:18px;color:var(--accent)">—</p>
+      <button type="button" class="btn block" id="topupGo">${t('Оплатить','Pay')}</button>
+    </div>
+  </div>`;
+}
+function payHTML(){const p=S.pay,planObj=p.kind==='plan'?plan(p.planId):null;return`<div class="modal-bg"><div class="modal card"><h2 style="margin-bottom:8px">${t('Оплата','Payment')}</h2><p class="muted">${p.kind==='topup'?`${t('Пополнение','Top up')} ${money(p.amount)}`:`${planObj?(S.lang==='ru'?planObj.ru:planObj.en):''} · ${p.disc?`<s style="opacity:.6">${p.basePrice} ₽</s> `:''}<b style="color:var(--accent)">${money(p.amount)}</b>${p.disc?` · 🏷 -${p.disc}%`:''}`}</p><p class="muted" style="margin:10px 0;font-size:12px">${t('Платёжка позже. Сейчас два исхода вручную.','Payment provider later. Confirm manually.')}</p><button class="btn block" id="payOk">${t('Платёж прошёл','Payment succeeded')}</button><button class="btn ghost block" style="margin-top:8px" id="payFail">${t('Не прошёл','Did not go through')}</button></div></div>`}
+function secretHTML(){return`<div class="modal-bg" id="secretBg" style="place-items:center"><div class="modal card" id="secretBox" style="margin:0">
+  <h2 style="font-size:18px">${t('Вход в панель','Panel login')}</h2>
+  <input id="admLogin" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${t('Логин','Login')}" style="margin-top:12px" value="">
+  <input id="admPass" type="password" autocomplete="new-password" placeholder="${t('Пароль','Password')}" style="margin-top:8px" value="">
+  <button type="button" class="btn block" style="margin-top:12px" id="admEnter">${t('Войти','Enter')}</button>
+  <button type="button" class="btn ghost block" style="margin-top:8px" id="admClose">${t('Закрыть','Close')}</button>
+</div></div>`}
+function adminHTML(){
+  let sec=S.adminSec||'users';
+  const senior=isSenior();
+  let tabs=[['users','👥',t('Клиенты','Clients')],['promos','🎟',t('Промо','Promos')],['cases','📦',t('Кейсы','Cases')],['support','💬',t('Тикеты','Tickets')],['events','🎉',t('Ивенты','Events')]];
+  tabs.push(['news','📰',t('Новости','News')]);
+  tabs.push(['servers','🖥',t('Серверы','Servers')]);
+  tabs=tabs.filter(x=>can(x[0]));
+  if(senior) tabs.push(['power','👑',t('Власть','Power')]);
+  if(!tabs.some(x=>x[0]===sec))sec=tabs[0]?tabs[0][0]:'users';
+  // client detail overlay
+  if(S.adminClient) return adminClientPanel();
+  return `
+  <div class="row" style="justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px">
+    <div>
+      <div class="muted" style="font-size:11px;font-weight:800;letter-spacing:.06em">${senior?t('СТАРШИЙ АДМИН','SENIOR ADMIN'):t('АДМИН','ADMIN')}</div>
+      <h1 style="font-size:20px;margin:2px 0">${t('Панель управления','Control panel')}</h1>
+      <div class="muted" style="font-size:12px">${S.login}${senior?' · 👑👑👑':''}</div>
+    </div>
+    <div class="row" style="gap:6px">
+      <button type="button" class="btn ghost" id="closeAdmin" style="min-height:40px;padding:0 12px">${t('Закрыть','Close')}</button>
+      <button type="button" class="btn danger" id="dropAdmin" style="min-height:40px;padding:0 12px">✕ ${t('Снять права','Drop role')}</button>
+    </div>
+  </div>
+  <div class="tabs" style="margin-bottom:12px">${tabs.map(([id,ic,l])=>`<button type="button" class="tab ${sec===id?'on':''}" data-asec="${id}">${ic} ${l}</button>`).join('')}</div>
+  ${sec==='users'?adminUsers():sec==='promos'?adminPromos():sec==='cases'?adminCases():sec==='support'?adminSupport():sec==='power'?adminPower():sec==='news'?adminNews():sec==='servers'?adminServers():sec==='events'?adminEvents():adminUsers()}`;
+}
+function adminClientPanel(){
+  const login=S.adminClient;
+  const p=S.people.find(x=>x.login===login);
+  if(!p){S.adminClient=null;return adminUsers()}
+  const senior=isSenior();
+  const cases=(S.customCases||[]);
+  return `
+  <div class="row" style="margin-bottom:12px;gap:8px;align-items:center">
+    <button type="button" class="btn ghost" id="backClient">←</button>
+    <div class="grow">
+      <div class="muted" style="font-size:11px;font-weight:800">${t('КЛИЕНТ','CLIENT')}</div>
+      <h2 style="font-size:18px">${p.login}</h2>
+    </div>
+    <button type="button" class="btn danger" id="closeAdmin" style="min-height:36px">✕</button>
+  </div>
+
+  <div class="card">
+    <div class="meta">
+      <span>${t('Баланс','Balance')}: <b>${money(p.balance||0)}</b></span>
+      <span>${t('Тариф','Plan')}: <b>${p.tariffId||'—'}</b></span>
+      <span>${t('До','Until')}: <b>${p.subEnd?when(p.subEnd,S.lang):'—'}</b></span>
+      <span>GB: <b>${(p.gb||0).toFixed?.(1)||p.gb||0}</b></span>
+    </div>
+    ${p.banned?`<p style="color:var(--danger);margin-top:8px;font-weight:800">🚫 ${t('Забанен','Banned')}: ${p.banReason||''}</p>`:''}
+  </div>
+
+  <div class="card">
+    <b>💰 ${t('Баланс и подписка','Balance & plan')}</b>
+    <div class="row wrap" style="margin-top:10px;gap:6px">
+      <button type="button" class="btn ghost" data-cu="bal50">+50₽</button>
+      <button type="button" class="btn ghost" data-cu="bal100">+100₽</button>
+      <button type="button" class="btn ghost" data-cu="bal500">+500₽</button>
+      <button type="button" class="btn ghost" data-cu="bal0">${t('Обнулить ₽','Zero ₽')}</button>
+    </div>
+    <div class="row" style="margin-top:8px;gap:8px">
+      <input id="cuBalSet" type="text" inputmode="numeric" placeholder="${t('Сумма ₽','Amount')}" class="grow">
+      <button type="button" class="btn" data-cu="balset">${t('Поставить','Set')}</button>
+    </div>
+    <div class="row wrap" style="margin-top:10px;gap:6px">
+      <button type="button" class="btn ghost" data-cu="d1">+1д</button>
+      <button type="button" class="btn ghost" data-cu="d7">+7д</button>
+      <button type="button" class="btn ghost" data-cu="d30">+30д</button>
+      <button type="button" class="btn ghost" data-cu="d365">+365д</button>
+      <button type="button" class="btn ghost" data-cu="dend">${t('Снять подписку','Clear sub')}</button>
+    </div>
+    <div class="row wrap" style="margin-top:10px;gap:6px">
+      <button type="button" class="btn ghost" data-cu="plan_c30">Комф. 30д</button>
+      <button type="button" class="btn ghost" data-cu="plan_c365">Комф. год</button>
+      <button type="button" class="btn ghost" data-cu="plan_s30">Сем. 30д</button>
+      <button type="button" class="btn ghost" data-cu="plan_d1">Деш. 1д</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <b>🎮 ${t('Игры и бонусы','Games & bonuses')}</b>
+    <div class="row wrap" style="margin-top:10px;gap:6px">
+      <button type="button" class="btn ghost" data-cu="spin3">+3🎰</button>
+      <button type="button" class="btn ghost" data-cu="spin10">+10🎰</button>
+      <button type="button" class="btn ghost" data-cu="disc5">+5%</button>
+      <button type="button" class="btn ghost" data-cu="disc10">+10%</button>
+      <button type="button" class="btn ghost" data-cu="dual">${t('Dual 24ч','Dual 24h')}</button>
+      <button type="button" class="btn ghost" data-cu="skip">${t('Сброс таймеров','Reset timers')}</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <b>📦 ${t('Выдать кейс','Give case')}</b>
+    <div class="row wrap" style="margin-top:10px;gap:6px">
+      ${cases.length?cases.map(c=>`<button type="button" class="btn ghost" data-give-case="${c.id}">${c.emoji||'📦'} ${c.name||c.ru}</button>`).join(''):`<span class="muted">${t('Нет кастомных кейсов','No custom cases')}</span>`}
+      <button type="button" class="btn ghost" data-give-case="c25">🥉 25</button>
+      <button type="button" class="btn ghost" data-give-case="c50">🥈 50</button>
+      <button type="button" class="btn ghost" data-give-case="c100">🥇 100</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <b>🚫 ${t('Ограничения','Restrictions')}</b>
+    ${isSenior()?`
+    <div class="row wrap" style="margin-top:10px;gap:6px">
+      <button type="button" class="btn ${p.protected?'accent':'ghost'}" data-cu="protect">🛡 ${p.protected?t('Защита вкл','Protected'):t('Защита','Protect')}</button>
+      <button type="button" class="btn ${p.blue?'accent':'ghost'}" data-cu="blue" style="${p.blue?'background:#3b82f6;color:#fff':''}">🔵 ${p.blue?t('Синий вкл','Blue on'):t('Синий','Blue')}</button>
+    </div>
+    `:''}
+    <label class="muted" style="display:block;margin:12px 0 4px;font-size:12px">${t('Причина','Reason')}</label>
+    <input id="cuBanReason" placeholder="${t('Причина','Reason')}" value="${(p.banReason||p.muteReason||p.blReason||'').replace(/"/g,'&quot;')}">
+    <label class="muted" style="display:block;margin:10px 0 4px;font-size:12px">${t('Срок (часы), 0 = навсегда','Hours, 0 = forever')}</label>
+    <input id="cuHours" type="text" inputmode="numeric" placeholder="24" value="24">
+    <div class="row wrap" style="margin-top:10px;gap:6px">
+      <button type="button" class="btn ${p.banned?'':'danger'}" data-cu="ban">${p.banned?t('Разбан','Unban'):t('Бан','Ban')}</button>
+      <button type="button" class="btn ${p.muted?'accent':'ghost'}" data-cu="mute">${p.muted?t('Снять мут','Unmute'):t('Мут','Mute')}</button>
+      <button type="button" class="btn ${p.blacklist?'danger':'ghost'}" data-cu="bl">${p.blacklist?t('Снять ЧС','Un-BL'):t('ЧС','Blacklist')}</button>
+      <button type="button" class="btn ${p.noGames?'accent':'ghost'}" data-cu="nogames">${p.noGames?t('Игры вкл','Games on'):t('Запрет игр','Ban games')}</button>
+      <button type="button" class="btn ${p.noBuy?'accent':'ghost'}" data-cu="nobuy">${p.noBuy?t('Покупка вкл','Buy on'):t('Запрет покупок','Ban buy')}</button>
+      <button type="button" class="btn ${p.noSupport?'accent':'ghost'}" data-cu="nosupport">${p.noSupport?t('Поддержка вкл','Support on'):t('Запрет тикетов','Ban tickets')}</button>
+    </div>
+    ${p.banned?`<p style="color:var(--danger);margin-top:8px;font-size:12px">🚫 ${p.banReason||''} ${p.banUntil?'· до '+when(p.banUntil,S.lang):'· ∞'}</p>`:''}
+    ${p.muted?`<p style="color:var(--accent);margin-top:4px;font-size:12px">🔇 ${p.muteReason||''} ${p.muteUntil?'· до '+when(p.muteUntil,S.lang):'· ∞'}</p>`:''}
+    ${p.blacklist?`<p style="color:var(--danger);margin-top:4px;font-size:12px">⛔ ЧС: ${p.blReason||''}</p>`:''}
+  </div>
+
+  <div class="card">
+    <b>💬 ${t('Переписка поддержки','Support history')}</b>
+    <div style="margin-top:10px;max-height:280px;overflow:auto">
+      ${(S.tickets||[]).filter(tk=>tk.login===p.login).length?
+        (S.tickets||[]).filter(tk=>tk.login===p.login).map(tk=>`
+          <div style="padding:10px;border-radius:12px;background:var(--surface2);margin-bottom:8px;border:1px solid var(--border)">
+            <div class="row" style="justify-content:space-between;gap:8px">
+              <b style="font-size:12px">${tk.status}</b>
+              <span class="muted" style="font-size:11px">${when(tk.createdAt||tk.at||Date.now(),S.lang)}</span>
+            </div>
+            <div class="muted" style="font-size:12px;margin-top:4px">${tk.text||tk.subject||''}</div>
+            ${(tk.thread||[]).map(m=>`
+              <div style="margin-top:6px;padding:8px;border-radius:8px;background:var(--surface);font-size:12px">
+                <b>${m.from==='admin'?'🛠':'👤'} ${m.login||m.from}</b>
+                <div style="margin-top:2px">${m.text}</div>
+                <div class="muted" style="font-size:10px;margin-top:2px">${when(m.at,S.lang)}</div>
+              </div>
+            `).join('')}
+          </div>
+        `).join('')
+        :`<p class="muted" style="font-size:12px">${t('Обращений нет','No tickets')}</p>`}
+    </div>
+  </div>
+
+  ${senior?`
+  <div class="card">
+    <b>⚠️ ${t('Опасная зона','Danger zone')}</b>
+    <div class="row wrap" style="margin-top:10px;gap:6px">
+      <button type="button" class="btn danger" data-cu="wipe">${t('Сбросить клиента','Wipe client')}</button>
+      <button type="button" class="btn danger" data-cu="del">${t('Удалить навсегда','Delete forever')}</button>
+    </div>
+  </div>`:''}
+  `;
+}function adminUsers(){
+  const q=(S.adminQ||'').toLowerCase();
+  const list=S.people.filter(p=>!q||p.login.toLowerCase().includes(q));
+  const senior=isSenior();
+  return `
+  <div class="card">
+    <div class="row" style="gap:8px">
+      <input id="adminSearch" value="${(S.adminQ||'').replace(/"/g,'&quot;')}" placeholder="${t('Поиск клиента…','Search client…')}" class="grow">
+      <button type="button" class="btn" id="adminSearchGo">🔍</button>
+    </div>
+    ${senior?`
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+      <b style="font-size:13px">${t('Создать клиента','Create client')}</b>
+      <div class="row" style="margin-top:8px;gap:8px">
+        <input id="newUserLogin" placeholder="${t('Логин','Login')}" class="grow">
+        <input id="newUserBal" type="text" inputmode="numeric" placeholder="₽" style="width:80px" value="0">
+      </div>
+      <button type="button" class="btn block" style="margin-top:8px" id="createUser">+ ${t('Создать','Create')}</button>
+    </div>`:''}
+  </div>
+  <div class="muted" style="font-size:12px;margin:8px 0">${t('Клиентов','Clients')}: ${list.length} · ${t('нажми на клиента','tap a client')}</div>
+  ${list.map(p=>`
+    <button type="button" class="card" data-open-client="${p.login}" style="width:100%;text-align:left;cursor:pointer;${p.banned?'border-color:var(--danger)':''}">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <b style="font-size:15px">${p.login}${p.blue?' 🔵':''}${p.login===S.login?' · you':''}${p.banned?' 🚫':''}${p.muted?' 🔇':''}${p.noGames?' 🎮⛔':''}${p.protected?' 🛡':''}</b>
+          <div class="muted" style="font-size:12px;margin-top:4px">${money(p.balance||0)} · ${p.tariffId||'—'} · ${p.subEnd?when(p.subEnd,S.lang):'—'}</div>
+        </div>
+        <span style="font-size:20px;opacity:.5">›</span>
+      </div>
+    </button>
+  `).join('')||`<p class="muted">${t('Никого нет','No one')}</p>`}`;
+}
+function adminPower(){
+  if(!isSenior()) return `<p class="muted">${t('Только старший админ','Senior only')}</p>`;
+  const ads=S.admins||[];
+  const log=S.modLog||[];
+  return `
+  <div class="card" style="text-align:center;padding:20px 16px;background:linear-gradient(160deg,#2a1a00,#1a1228 50%,#0d0d12);border:1px solid #f5b94255">
+    <div style="font-size:48px;line-height:1;filter:drop-shadow(0 0 12px #f5b94288)">👑</div>
+    <div style="font-size:28px;margin-top:-6px;opacity:.9">👑 👑</div>
+    <h2 style="margin-top:8px;font-size:18px;color:#f5b942">${t('Старший админ','Senior admin')}</h2>
+  </div>
+
+  <div class="card">
+    <b>➕ ${t('Создать админа','Create admin')}</b>
+    <input id="newAdmLogin" placeholder="${t('Логин админа','Admin login')}" style="margin-top:10px">
+    <input id="newAdmPass" type="text" placeholder="${t('Пароль','Password')}" style="margin-top:8px">
+    <div class="muted" style="font-size:12px;margin-top:10px;font-weight:800">${t('Что можно этому админу:','Permissions:')}</div><div class="row wrap" style="gap:6px 14px;margin-top:6px">${PERMS.map(([k,ru,en])=>`<label class="row" style="gap:6px;font-size:13px"><input type="checkbox" id="np_${k}" ${permsOf(null)[k]?'checked':''}>${S.lang==='ru'?ru:en}</label>`).join('')}</div>
+    <button type="button" class="btn block" style="margin-top:10px" id="createAdmin">+ ${t('Создать админа','Create admin')}</button>
+  </div>
+
+  <div class="card">
+    <b>🛡 ${t('Админы','Admins')}</b>
+    <div style="margin-top:8px">
+      <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div><b>admin</b> <span class="chip">system</span></div>
+        <span class="muted" style="font-size:11px">${t('защищён','protected')}</span>
+      </div>
+      <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div><b>AAAP4GPMX</b> <span class="chip">👑 senior</span></div>
+        <span class="muted" style="font-size:11px">${t('вы','you')}</span>
+      </div>
+      ${ads.filter(a=>a.login.toLowerCase()!=='admin').map(a=>`
+        <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+          <div class="row" style="justify-content:space-between">
+            <div>
+              <b>${a.login}</b> ${a.banned?'🚫':''} ${a.protected?'🛡':''}
+              <div class="muted" style="font-size:11px">${a.role||'admin'}</div>
+            </div>
+          </div>
+          <div class="row wrap" style="margin-top:6px;gap:6px">${PERMS.map(([k,ru,en])=>`<button type="button" class="btn ${permsOf(a)[k]?'accent':'ghost'}" style="min-height:30px;font-size:11px;padding:0 10px" data-ad-act="pm_${k}:${a.login}">${permsOf(a)[k]?'✔ ':''}${S.lang==='ru'?ru:en}</button>`).join('')}</div>
+          <div class="row wrap" style="margin-top:6px;gap:6px">
+            <button type="button" class="btn ghost" style="min-height:32px" data-ad-act="prot:${a.login}">${a.protected?t('Снять защиту','Unprotect'):t('Защита','Protect')}</button>
+            <button type="button" class="btn ghost" style="min-height:32px" data-ad-act="blue:${a.login}">${a.blue?'🔵':t('Синий','Blue')}</button>
+            <button type="button" class="btn ${a.muted?'accent':'ghost'}" style="min-height:32px" data-ad-act="mute:${a.login}">${a.muted?t('Снять мут','Unmute'):t('Мут','Mute')}</button>
+            <button type="button" class="btn ${a.banned?'':'danger'}" style="min-height:32px" data-ad-act="ban:${a.login}">${a.banned?t('Разбан','Unban'):t('Бан','Ban')}</button>
+            <button type="button" class="btn ${a.blacklist?'danger':'ghost'}" style="min-height:32px" data-ad-act="bl:${a.login}">${a.blacklist?t('Снять ЧС','Un-BL'):t('ЧС ∞','BL ∞')}</button>
+            <button type="button" class="btn danger" style="min-height:32px" data-ad-act="del:${a.login}">×</button>
+          </div>
+          ${a.blacklist?`<div style="color:var(--danger);font-size:11px;margin-top:4px">⛔ ЧС ∞</div>`:''}
+        </div>
+      `).join('')||`<p class="muted" style="margin-top:8px;font-size:12px">${t('Доп. админов нет','No extra admins')}</p>`}
+    </div>
+  </div>
+
+  <div class="card">
+    <b>📋 ${t('Лента модерации','Moderation feed')}</b>
+    <div style="margin-top:10px;max-height:320px;overflow:auto">
+      ${log.length?log.map(e=>`
+        <div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:12px">
+          <b>${e.action}</b> → <b>${e.target}</b>
+          <div class="muted">${e.by} · ${when(e.at,S.lang)}${e.until?` · ${t('до','until')} ${when(e.until,S.lang)}`:''}</div>
+          ${e.reason?`<div style="margin-top:2px">${e.reason}</div>`:''}
+        </div>
+      `).join(''):`<p class="muted">${t('Пока пусто','Empty')}</p>`}
+    </div>
+  </div>
+
+  <div class="card">
+    <b>${t('Быстро себе','Quick self')}</b>
+    <div class="row wrap" style="margin-top:10px;gap:8px">
+      <button type="button" class="btn" data-self="bal500">+500₽</button>
+      <button type="button" class="btn" data-self="spins10">+10🎰</button>
+      <button type="button" class="btn" data-self="days30">+30д</button>
+      <button type="button" class="btn" data-self="disc10">+10%</button>
+      <button type="button" class="btn" data-self="dual">dual 24ч</button>
+      <button type="button" class="btn" data-self="unban">${t('Снять бан','Clear ban')}</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="meta">
+      <span>${t('Клиенты','Clients')}: ${S.people.length}</span>
+      <span>${t('Тикеты','Tickets')}: ${S.tickets.length}</span>
+      <span>${t('Админы','Admins')}: ${1+(S.admins||[]).length}</span>
+    </div>
+  </div>
+  <button type="button" class="btn danger block" id="closeAdmin2">✕ ${t('Снять права админа','Drop admin role')}</button>`;
+}function adminCases(){
+  const d=S.caseDraft||{name:'',emoji:'📦',price:50,desc:'',shop:true,promo:false,drops:[{l:'+10 ₽',k:'money',v:10,w:50},{l:'+1 день',k:'days',v:1,w:50}]};
+  S.caseDraft=d;
+  const list=S.customCases||[];
+  const inv=S.myCases||[];
+  const opened=S.stats&&S.stats.cases||0;
+  return `
+  <div class="card">
+    <b>${t('Создать кейс','Create case')}</b>
+    <input id="csName" value="${(d.name||'').replace(/"/g,'&quot;')}" placeholder="${t('Название','Name')}" style="margin-top:10px">
+    <div class="row" style="margin-top:8px;gap:8px">
+      <input id="csEmoji" value="${d.emoji||'📦'}" style="width:70px" placeholder="📦">
+      <input id="csPrice" type="number" value="${d.price||0}" class="grow" placeholder="${t('Цена','Price')}">
+    </div>
+    <input id="csDesc" value="${(d.desc||'').replace(/"/g,'&quot;')}" placeholder="${t('Описание','Description')}" style="margin-top:8px">
+    <label class="row" style="margin-top:10px;gap:8px"><input type="checkbox" id="csShop" ${d.shop!==false?'checked':''}> ${t('Показывать в магазине','Show in shop')}</label>
+    <label class="row" style="margin-top:6px;gap:8px"><input type="checkbox" id="csPromo" ${d.promo?'checked':''}> ${t('Можно выдать промокодом','Grant via promo')}</label>
+  </div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <b>${t('Награды внутри','Drops')}</b>
+      <button type="button" class="btn ghost" id="csAddDrop" style="min-height:32px;padding:0 10px">+</button>
+    </div>
+    ${(d.drops||[]).map((x,i)=>`
+      <div style="margin-top:8px;padding:10px;border-radius:12px;background:var(--surface2)">
+        <div class="row" style="gap:8px">
+          <select data-cd-k="${i}" class="grow">
+            <option value="money" ${x.k==='money'?'selected':''}>💰 ₽</option>
+            <option value="days" ${x.k==='days'?'selected':''}>📅 ${t('Дни','Days')}</option>
+            <option value="spins" ${x.k==='spins'?'selected':''}>🎰 ${t('Крутки','Spins')}</option>
+            <option value="discount" ${x.k==='discount'?'selected':''}>🏷 %</option>
+            <option value="gb" ${x.k==='gb'?'selected':''}>📶 GB</option>
+            <option value="case" ${x.k==='case'?'selected':''}>📦 ${t('Кейс','Case')}</option>
+          </select>
+          <input data-cd-v="${i}" type="text" value="${x.v??0}" style="width:100px;font-family:monospace;font-size:12px" title="value or cs_id" placeholder="N / cs_">
+          <input data-cd-w="${i}" type="number" value="${x.w??1}" style="width:70px" title="% chance weight">
+          <button type="button" class="btn danger" data-cd-del="${i}" style="min-height:36px;padding:0 8px">×</button>
+        </div>
+        <input data-cd-l="${i}" value="${(x.l||'').replace(/"/g,'&quot;')}" placeholder="${t('Подпись','Label')}" style="margin-top:6px">
+      </div>`).join('')}
+  </div>
+  <button type="button" class="btn block" id="csCreate">${t('Создать кейс','Create case')}</button>
+
+  <div class="card" style="margin-top:14px">
+    <b>📊 ${t('Статистика кейсов','Case stats')}</b>
+    <div class="meta" style="margin-top:10px">
+      <span>${t('Кастомных','Custom')}: ${list.length}</span>
+      <span>${t('В инвентарях (сессия)','In inventory')}: ${inv.length}</span>
+      <span>${t('Открыто (сессия)','Opened')}: ${opened}</span>
+    </div>
+  </div>
+
+  <h3 style="font-size:13px;margin:16px 0 8px">${t('Все кейсы + ID','All cases + ID')}</h3>
+  ${list.map(c=>{
+    const owned=inv.filter(x=>x.id===c.id).length;
+    return `<div class="card">
+      <div class="row" style="justify-content:space-between;align-items:flex-start">
+        <div class="row" style="gap:10px;align-items:flex-start">
+          <div class="case-img" style="width:44px;height:44px;margin:0;font-size:22px">${c.emoji||'📦'}</div>
+          <div>
+            <b>${c.name||c.ru}</b>
+            <div class="muted" style="font-size:11px;margin-top:2px">${money(c.price||0)} · ${(c.drops||[]).length} ${t('наград','drops')} · ${c.shop!==false?t('в магазине','in shop'):t('скрыт','hidden')}${c.promo?' · promo':''}</div>
+            <div style="margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--surface2);font-family:monospace;font-size:12px;word-break:break-all">
+              <span class="muted">ID:</span> <b id="cid-${c.id}">${c.id}</b>
+            </div>
+            <div class="muted" style="font-size:11px;margin-top:6px">${t('В инвентаре сейчас','Owned now')}: ${owned}</div>
+            <div class="row wrap" style="margin-top:8px">
+              <button type="button" class="btn ghost" style="min-height:34px" data-copy-id="${c.id}">📋 ${t('Копировать ID','Copy ID')}</button>
+              <button type="button" class="btn danger" style="min-height:34px" data-cs-del="${c.id}">×</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('')||`<p class="muted">${t('Пока нет кастомных кейсов','No custom cases yet')}</p>`}
+  <p class="muted" style="margin-top:8px;font-size:12px">${t('Скопируй ID → промо kind=case value=ID · в ивенте награда «Кейс» и этот ID','Copy ID → promo kind=case value=ID · event reward Case + this ID')}</p>`;
+}
+
+function adminPromos(){return`<div class="card"><input id="pCode" placeholder="CODE"><select id="pKind" style="margin-top:8px"><option value="money">money</option><option value="days">days</option><option value="spins">spins</option><option value="dual">dual days</option><option value="discount">discount %</option><option value="case">case (id)</option></select><input id="pVal" type="text" value="50" placeholder="50 или cs_xxxx" style="margin-top:8px;font-family:monospace"><input id="pUses" type="number" value="0" placeholder="0=∞" style="margin-top:8px"><button class="btn block" style="margin-top:10px" id="pCreate">${t('Создать','Create')}</button></div>${S.promos.map(p=>`<div class="card row" style="justify-content:space-between"><div><b>${p.code}</b><div class="muted" style="font-size:12px">${p.kind} ${p.value} · ${p.used}/${p.uses||'∞'}</div></div><button class="btn danger" data-pdel="${p.code}">×</button></div>`).join('')}`}
+function adminSupport(){
+  if(S.openTicketId){
+    const tk=S.tickets.find(x=>x.id===S.openTicketId);
+    if(!tk){S.openTicketId='';}
+    else{
+      const isMine=tk.assignee===S.login;
+      const canReply=tk.status!=='closed'&&(isMine||tk.status==='open');
+      return `<div class="row" style="margin-bottom:12px"><button class="btn ghost" id="backTickets">← ${t('Назад','Back')}</button><b class="grow" style="text-align:center">${tk.login}</b></div>
+      <div class="card">
+        <p class="muted" style="font-size:12px">${tk.status==='closed'?t('Закрыто','Closed'):tk.status==='taken'?t('В работе: ','In progress: ')+(tk.assignee||''):t('В очереди','In queue')}</p>
+        <div style="margin-top:10px;max-height:280px;overflow-y:auto">${(tk.thread||[]).map(m=>`
+          <div style="margin-bottom:10px;padding:10px;border-radius:12px;background:${m.from==='admin'?'color-mix(in srgb,var(--primary) 18%, transparent)':'var(--surface2)'}">
+            <div class="row" style="justify-content:space-between"><b style="font-size:12px">${m.from==='admin'?'🛠 '+m.login:m.from==='ai'?'🤖 '+m.login:'👤 '+m.login}</b><span class="muted" style="font-size:11px">${when(m.at,S.lang)}</span></div>
+            <p style="margin-top:6px;font-size:14px;white-space:pre-wrap">${esc(m.text)}</p>${m.img?`<img class="chat-img" src="${m.img}" alt="">`:''}
+          </div>`).join('')}</div>
+        ${tk.status==='closed'?`
+          <button class="btn block" style="margin-top:12px" id="reopenTicket">${t('Открыть снова','Reopen')}</button>
+        `:canReply?`
+          <textarea id="replyText" rows="2" style="margin-top:12px" placeholder="${t('Ответ клиенту…','Reply to client…')}"></textarea>
+          <button class="btn block" style="margin-top:8px" id="sendReply">${t('Отправить','Send')}</button>
+          <div class="row wrap" style="margin-top:10px">
+            ${tk.status==='open'?`<button class="btn" data-take="${tk.id}">${t('Взять','Take')}</button>`:''}
+            ${isMine||tk.status==='taken'?`<button class="btn danger" data-close="${tk.id}">${t('Закрыть','Close')}</button>`:''}
+            ${isMine?`<button class="btn ghost" data-transfer="${tk.id}">${t('Передать','Transfer')}</button><button class="btn ghost" data-leave="${tk.id}">${t('Выйти','Leave')}</button>`:''}
+          </div>
+        `:`
+          <div class="row wrap" style="margin-top:12px">
+            ${tk.status==='open'?`<button class="btn" data-take="${tk.id}">${t('Взять','Take')}</button>`:''}
+          </div>
+        `}
+      </div>`;
+    }
+  }
+  const queue=S.tickets.filter(t=>t.status==='open');
+  const mine=S.tickets.filter(t=>t.status!=='closed'&&t.assignee===S.login);
+  const closed=S.tickets.filter(t=>t.status==='closed');
+  return `<h3 style="font-size:13px">${t('Очередь','Queue')}</h3>
+  ${queue.length?queue.map(tk=>`
+    <button class="card" style="width:100%;text-align:left;border:1px solid var(--border);background:var(--surface);color:var(--fg)" data-open-tk="${tk.id}">
+      <b>${tk.login}: ${(tk.thread&&tk.thread[0]?tk.thread[0].text:tk.text).slice(0,70)}</b>
+      <p class="muted" style="margin-top:6px">${tk.thread?tk.thread.length:0} ${t('сообщ.','msgs')}</p>
+      <div class="row" style="margin-top:8px" onclick="event.stopPropagation()">
+        <button class="btn" data-take="${tk.id}">${t('Взять','Take')}</button>
+      </div>
+    </button>`).join(''):`<p class="muted">—</p>`}
+  <h3 style="font-size:13px;margin-top:12px">${t('Мои открытые','Mine open')}</h3>
+  ${mine.length?mine.map(tk=>`
+    <button class="card" style="width:100%;text-align:left;border:1px solid var(--border);background:var(--surface);color:var(--fg)" data-open-tk="${tk.id}">
+      <b>${tk.login}: ${(tk.thread&&tk.thread[0]?tk.thread[0].text:tk.text).slice(0,70)}</b>
+      <p class="muted" style="margin-top:6px">${tk.thread?tk.thread.length:0} ${t('сообщ.','msgs')}</p>
+    </button>`).join(''):`<p class="muted">—</p>`}
+  <h3 style="font-size:13px;margin-top:12px">${t('Закрытые','Closed')}</h3>
+  ${closed.length?closed.map(tk=>`
+    <button class="card" style="width:100%;text-align:left;border:1px solid var(--border);background:var(--surface);color:var(--fg);opacity:.9" data-open-tk="${tk.id}">
+      <b>${tk.login}: ${(tk.thread&&tk.thread[0]?tk.thread[0].text:tk.text).slice(0,70)}</b>
+      <p class="muted" style="margin-top:6px">${when(tk.closedAt,S.lang)} · ★ ${tk.rating??'—'} · ${t('нажми открыть','tap to open')}</p>
+    </button>`).join(''):`<p class="muted">—</p>`}`;
+}
+function adminEvents(){
+  const emptyPass=()=>({name:t('Подписка','Pass'),price:0,color:'#93c5fd',
+    levels:[{level:1,reward:{kind:'money',amount:10}}],
+    tasks:[{text:t('Потратить трафик','Spend traffic'),kind:'gb',amount:1}]
+  });
+  const draft=S.evDraft||{name:'',theme:'halloween',start:'',end:'',
+    passes:[emptyPass(),{...emptyPass(),name:t('Платный','Paid'),price:50,color:'#f5b942',
+      levels:[{level:1,reward:{kind:'money',amount:25}},{level:2,reward:{kind:'days',amount:1}}],
+      tasks:[{text:t('Потратить трафик','Spend traffic'),kind:'gb',amount:3}]}]
+  };
+  (draft.passes||[]).forEach(p=>{
+    if(!p.levels) p.levels=[{level:1,reward:{kind:'money',amount:10}}];
+    if(!p.tasks) p.tasks=[{text:t('Задание','Task'),kind:'other',amount:1}];
+    (p.levels||[]).forEach(l=>{
+      if(typeof l.reward==='string'){
+        const m=parseInt(String(l.reward).replace(/\D/g,''),10)||0;
+        l.reward={kind:'money',amount:m||10};
+      }
+      if(!l.reward||typeof l.reward!=='object') l.reward={kind:'money',amount:10};
+    });
+  });
+  S.evDraft=draft;
+  if(S.evPassTab==null) S.evPassTab=0;
+  if(S.evPassTab>=(draft.passes||[]).length) S.evPassTab=Math.max(0,(draft.passes||[]).length-1);
+  const pi=S.evPassTab;
+  const cur=(draft.passes||[])[pi];
+  const themes=[
+    ['halloween','🎃 Halloween'],['winter','❄️ '+t('Зима','Winter')],['summer','☀️ '+t('Лето','Summer')],
+    ['autumn','🍂 '+t('Осень','Autumn')],['spring','🌸 '+t('Весна','Spring')],
+    ['newyear','🎄 '+t('Новый год','New Year')],['other','🎭 '+t('Другой / праздник','Other / holiday')],['default','✨ Default']
+  ];
+  return `
+  <div class="card">
+    <b>${t('Новый ивент','New event')}</b>
+    <label class="muted" style="display:block;margin:10px 0 4px;font-size:12px">${t('Название','Name')}</label>
+    <input id="evName" value="${(draft.name||'').replace(/"/g,'&quot;')}">
+    <label class="muted" style="display:block;margin:10px 0 4px;font-size:12px">${t('Тема','Theme')}</label>
+    <select id="evTheme">${themes.map(([v,l])=>`<option value="${v}" ${draft.theme===v?'selected':''}>${l}</option>`).join('')}</select>
+    <div class="row" style="margin-top:10px;gap:8px">
+      <div class="grow"><label class="muted" style="display:block;margin-bottom:4px;font-size:12px">${t('Начало','Start')}</label><input id="evStart" type="datetime-local" value="${draft.start||''}"></div>
+      <div class="grow"><label class="muted" style="display:block;margin-bottom:4px;font-size:12px">${t('Конец','End')}</label><input id="evEnd" type="datetime-local" value="${draft.end||''}"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px">
+      <b>${t('Подписки','Passes')}</b>
+      <button type="button" class="btn ghost" id="evAddPass" style="min-height:32px;padding:0 10px">+</button>
+    </div>
+    <div class="tabs">${(draft.passes||[]).map((p,i)=>`
+      <button type="button" class="tab ${pi===i?'on':''}" data-pass-tab="${i}" style="border-left:3px solid ${p.color}">${p.name||('#'+(i+1))}</button>
+    `).join('')}</div>
+    ${cur?`
+      <div style="margin-top:10px;padding:12px;border-radius:12px;background:var(--surface2);border-left:4px solid ${cur.color}">
+        <div class="row" style="gap:8px">
+          <input data-pass-name="${pi}" value="${(cur.name||'').replace(/"/g,'&quot;')}" class="grow" placeholder="${t('Название','Name')}">
+          <input data-pass-price="${pi}" type="number" value="${cur.price}" style="width:80px">
+          <input data-pass-color="${pi}" type="color" value="${cur.color}" style="width:44px;padding:4px;height:44px">
+          ${(draft.passes||[]).length>1?`<button type="button" class="btn danger" data-pass-del="${pi}" style="min-height:36px;padding:0 10px">×</button>`:''}
+        </div>
+      </div>
+
+      <div style="margin-top:14px">
+        <div class="row" style="justify-content:space-between">
+          <b style="font-size:13px">${t('Награды этой подписки','Rewards for this pass')}</b>
+          <button type="button" class="btn ghost" id="evAddLvl" style="min-height:32px;padding:0 10px">+</button>
+        </div>
+        <p class="muted" style="font-size:11px;margin:4px 0 8px">${t('Тип + число','Type + number')}</p>
+        ${(cur.levels||[]).map((l,i)=>{
+          const r=l.reward||{kind:'money',amount:10};
+          return `<div style="margin-top:8px;padding:10px;border-radius:12px;background:var(--surface2)">
+            <div class="row" style="gap:8px;margin-bottom:8px">
+              <span class="muted" style="font-size:12px;font-weight:800">LVL</span>
+              <input data-lvl-n="${i}" type="number" value="${l.level}" style="width:70px">
+              <button type="button" class="btn danger" data-lvl-del="${i}" style="min-height:36px;padding:0 10px;margin-left:auto">×</button>
+            </div>
+            <div class="row" style="gap:8px">
+              <select data-lvl-kind="${i}" class="grow">
+                <option value="money" ${r.kind==='money'?'selected':''}>💰 ₽</option>
+                <option value="days" ${r.kind==='days'?'selected':''}>📅 ${t('Дни','Days')}</option>
+                <option value="spins" ${r.kind==='spins'?'selected':''}>🎰 ${t('Крутки','Spins')}</option>
+                <option value="discount" ${r.kind==='discount'?'selected':''}>🏷 %</option>
+                <option value="gb" ${r.kind==='gb'?'selected':''}>📶 GB</option>
+                <option value="other" ${r.kind==='other'?'selected':''}>✨ ${t('Другое','Other')}</option>
+                <option value="case" ${r.kind==='case'?'selected':''}>📦 ${t('Кейс (id)','Case id')}</option>
+              </select>
+              <input data-lvl-amount="${i}" type="number" min="0" step="any" value="${typeof r.amount==='number'?r.amount:0}" style="width:90px;${r.kind==='case'?'display:none':''}" title="N">
+              <input data-lvl-case="${i}" type="text" value="${r.kind==='case'?(r.caseId||r.amount||''):''}" placeholder="cs_xxx" style="flex:1;min-width:100px;font-family:monospace;font-size:12px;${r.kind==='case'?'':'display:none'}" title="Case ID">
+            </div>
+            ${r.kind==='case'?`<p class="muted" style="font-size:11px;margin-top:6px">${t('Вставь ID кейса из раздела Кейсы','Paste case ID from Cases tab')}</p>`:''}
+          </div>`;
+        }).join('')}
+      </div>
+
+      <div style="margin-top:14px">
+        <div class="row" style="justify-content:space-between">
+          <b style="font-size:13px">${t('Задания этой подписки','Tasks for this pass')}</b>
+          <button type="button" class="btn ghost" id="evAddTask" style="min-height:32px;padding:0 10px">+</button>
+        </div>
+        <p class="muted" style="font-size:11px;margin:4px 0 8px">${t('Тип + число. 1 задание ≈ 1 день.','Type + number. 1 task ≈ 1 day.')}</p>
+        ${(cur.tasks||[]).map((tk,i)=>`
+          <div style="margin-top:8px;padding:10px;border-radius:12px;background:var(--surface2)">
+            <input data-task-text="${i}" value="${(tk.text||'').replace(/"/g,'&quot;')}">
+            <div class="row" style="margin-top:8px;gap:8px">
+              <select data-task-kind="${i}" class="grow">
+                <option value="gb" ${tk.kind==='gb'?'selected':''}>📶 GB</option>
+                <option value="server" ${tk.kind==='server'?'selected':''}>🌍 ${t('Сервер','Server')}</option>
+                <option value="spin" ${tk.kind==='spin'?'selected':''}>🎮 ${t('Игры','Games')}</option>
+                <option value="days" ${tk.kind==='days'?'selected':''}>📅 ${t('Дни','Days')}</option>
+                <option value="discount" ${tk.kind==='discount'?'selected':''}>🏷 %</option>
+                <option value="other" ${tk.kind==='other'?'selected':''}>✨ ${t('Другое','Other')}</option>
+              </select>
+              <input data-task-amount="${i}" type="number" min="0" step="any" value="${tk.amount??1}" style="width:90px">
+            </div>
+            <button type="button" class="btn danger block" style="margin-top:8px;min-height:36px" data-task-del="${i}">×</button>
+          </div>`).join('')}
+      </div>
+    `:'<p class="muted">—</p>'}
+  </div>
+
+  <button type="button" class="btn block" id="evCreate">${t('Создать ивент','Create event')}</button>
+
+  <h3 style="font-size:13px;margin:16px 0 8px">${t('Существующие','Existing')}</h3>
+  ${S.events.length?S.events.map(ev=>{
+    const st=evStatus(ev);
+    const label=st==='live'?t('идёт','live'):st==='soon'?t('скоро','soon'):t('конец','ended');
+    return `<div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <b>${ev.name}</b>
+          <div class="muted" style="font-size:12px">${label} · ${ev.theme}</div>
+          <div class="muted" style="font-size:11px">${when(ev.start,S.lang)} → ${when(ev.end,S.lang)}</div>
+          <div style="margin-top:6px">${(ev.passes||[]).map(p=>`<span class="chip" style="background:${p.color};color:#111">${p.name} · ${(p.levels||[]).length} LVL · ${(p.tasks||[]).length} ${t('зад.','tasks')}</span>`).join('')}</div>
+        </div>
+        <button type="button" class="btn danger" data-evdel="${ev.id}">×</button>
+      </div>
+    </div>`;
+  }).join(''):`<p class="muted">${t('Пока эвентов нет','No events yet')}</p>`}`;
+}
+function bindHome(){
+  document.querySelectorAll('[data-tab-go]').forEach(b=>b.onclick=()=>{S.tab=b.dataset.tabGo;S.adminOpen=false;render()});
+  document.querySelectorAll('[data-vpn]').forEach(b=>b.onclick=()=>{S.vpnShow=S.vpnShow===b.dataset.vpn?null:b.dataset.vpn;render()});
+  document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{
+    try{await navigator.clipboard.writeText(b.dataset.copy);toast(t('Скопировано','Copied'))}
+    catch(e){toast(t('Не удалось скопировать','Copy failed'))}
+  });
+  const cj=document.querySelector('[data-copy-json]');
+  if(cj) cj.onclick=async()=>{
+    const j=S.vpnJson||'{\n  "remarks": "JOD VPN",\n  "dns": { "servers": ["1.1.1.1"] },\n  "outbounds": [{ "protocol": "vless", "tag": "proxy" }]\n}';
+    try{await navigator.clipboard.writeText(j);toast(t('Скопировано','Copied'))}catch(e){toast(t('Не удалось скопировать','Copy failed'))}
+  };
+}
+function bindShell(){
+  document.querySelectorAll('input,textarea').forEach(el=>{
+    el.addEventListener('focus',()=>{S._focusId=el.id||null});
+  });
+
+  const logo=document.getElementById('logoTap');
+  if(logo){
+    logo.onclick=()=>{
+      const now=Date.now();
+      if(!S._logoTapAt || now-(S._logoTapAt)>2500) S._logoTaps=0;
+      S._logoTapAt=now;
+      S._logoTaps=(S._logoTaps||0)+1;
+      if(S._logoTaps>=5){
+        S._logoTaps=0;
+        S.secret=true;
+        S.adminOpen=false;
+        render();
+      }
+    };
+  }
+  document.getElementById('menuBtn').onclick=()=>{S.drawer=true;S.menuPage='main';render()};
+  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{S.tab=b.dataset.tab;S.adminOpen=false;S.drawer=false;S.secret=false;S.pay=null;S.topupOpen=false;S.openTicketId='';blip();render()});
+  if(S.drawer)bindDrawer();
+  if(S.topupOpen)bindTopupModal();
+  if(S.pay)bindPay();
+  if(S.secret)bindSecret();
+  if(S.adminOpen)bindAdmin();
+  else if(S.tab==='buy')bindBuy();
+  else if(S.tab==='support')bindSupport();
+  else if(S.tab==='events')bindEvents();
+  else if(S.tab==='games')bindGames();
+  else if(S.tab==='home'&&!S.adminOpen)bindHome();
+}
+function bindTopupModal(){
+  let amount=0;
+  const prev=document.getElementById('topupPreview');
+  const inp=document.getElementById('topupCustom');
+  const setAmt=(n)=>{
+    amount=Math.max(0,parseInt(String(n).replace(/\\D/g,''),10)||0);
+    if(prev) prev.textContent=amount? (amount+' ₽') : '—';
+    if(inp && document.activeElement!==inp) inp.value=amount?String(amount):'';
+  };
+  document.getElementById('topupClose').onclick=()=>{S.topupOpen=false;render();};
+  document.getElementById('topupModalBg').onclick=e=>{ if(e.target.id==='topupModalBg'){S.topupOpen=false;render();} };
+  document.getElementById('topupModalBox').onclick=e=>e.stopPropagation();
+  document.querySelectorAll('[data-amt]').forEach(b=>{
+    b.onclick=e=>{e.preventDefault();e.stopPropagation();setAmt(b.dataset.amt);if(inp)inp.value=String(b.dataset.amt);};
+  });
+  if(inp){
+    inp.oninput=()=>{
+      const n=parseInt(String(inp.value).replace(/\\D/g,''),10)||0;
+      amount=n;
+      if(prev) prev.textContent=n?(n+' ₽'):'—';
+    };
+    // delay focus so keyboard works on mobile
+    setTimeout(()=>{try{inp.focus();}catch(e){}},50);
+  }
+  document.getElementById('topupGo').onclick=e=>{
+    e.preventDefault();
+    const fromInput=parseInt(String((inp&&inp.value)||'').replace(/\\D/g,''),10)||0;
+    const finalAmt=fromInput||amount;
+    if(!finalAmt||finalAmt<1){toast(t('Укажите сумму','Enter amount'));return;}
+    S.topupOpen=false;
+    S.pay={kind:'topup',amount:finalAmt};
+    render();
+  };
+}
+function bindDrawer(){
+  document.getElementById('drawerBg').onclick=e=>{ if(e.target.id==='drawerBg'){S.drawer=false;S.menuPage=null;render();} };
+  const close=document.getElementById('closeDrawer');
+  if(close) close.onclick=()=>{S.drawer=false;S.menuPage=null;render();};
+  document.querySelectorAll('[data-menu]').forEach(b=>{
+    b.onclick=()=>{S.menuPage=b.dataset.menu;render();};
+  });
+  const ot=document.getElementById('openTopup');
+  if(ot) ot.onclick=()=>{S.drawer=false;S.menuPage=null;S.topupOpen=true;render();};
+
+  // topup: empty field, quick chips, no locked value
+  document.querySelectorAll('[data-quick-sum]').forEach(b=>{
+    b.onclick=()=>{
+      const inp=document.getElementById('topupSum');
+      if(inp){ inp.value=String(b.dataset.quickSum); inp.focus(); }
+    };
+  });
+  const topupBtn=document.getElementById('topupBtn');
+  if(topupBtn){
+    topupBtn.onclick=()=>{
+      const inp=document.getElementById('topupSum');
+      const raw=String((inp&&inp.value)||'').replace(/[^0-9]/g,'');
+      const amount=parseInt(raw,10);
+      if(!amount||amount<1){toast(t('Введи сумму','Enter amount'));if(inp)inp.focus();return;}
+      S.pay={kind:'topup',amount};
+      S.drawer=false;S.menuPage=null;
+      render();
+    };
+  }
+  const cc=document.getElementById('customColor');
+  if(cc) cc.oninput=()=>{S.customColor=cc.value;S.theme='custom';S.light=false;applyTheme();save()};
+  const sound=document.getElementById('soundChk');
+  if(sound) sound.onchange=e=>{S.sound=e.target.checked;save();if(S.sound)blip(700)};
+  const glassChk=document.getElementById('glassChk');
+  if(glassChk) glassChk.onchange=e=>{S.glass=e.target.checked;applyTheme();save();render();};
+  const langRu=document.getElementById('langRu');
+  if(langRu) langRu.onclick=()=>{S.lang='ru';render();};
+  const langEn=document.getElementById('langEn');
+  if(langEn) langEn.onclick=()=>{S.lang='en';render();};
+  const light=document.getElementById('lightBtn');
+  if(light) light.onclick=()=>{S.light=!S.light;if(S.light)S.theme='white';applyTheme();render();};
+  document.querySelectorAll('[data-theme]').forEach(b=>{
+    b.onclick=()=>{S.theme=b.dataset.theme;S.light=(S.theme==='white');if(S.theme==='black'||S.theme==='blue'||S.theme==='purple'||S.theme==='gray')S.light=false;applyTheme();save();render();};
+  });
+  const renameBtn=document.getElementById('renameBtn');
+  if(renameBtn) renameBtn.onclick=()=>{
+    const n=document.getElementById('renameField').value.trim();
+    if(!n) return;
+    const prev=S.login;
+    S.people=S.people.map(p=>p.login===prev?{...p,login:n}:p);
+    S.tickets=S.tickets.map(tk=>tk.login===prev?{...tk,login:n}:tk);
+    if((S.trialLogins||[]).includes(prev.toLowerCase()))S.trialLogins.push(n.toLowerCase());
+    S.profiles=S.profiles||{};delete S.profiles[prev.toLowerCase()];
+    S.login=n;render();
+  };
+  const oa=document.getElementById('openAdmin');
+  if(oa) oa.onclick=()=>{S.adminOpen=true;S.drawer=false;S.menuPage=null;render();};
+  const ear=document.getElementById('exitAdminRole');
+  if(ear) ear.onclick=()=>{S.drawer=false;S.menuPage=null;S.adminOpen=false;S.adminClient=null;S.isAdmin=false;S.adminRole=null;save();toast(t('Вы больше не админ','Admin role removed'));render();};
+
+  const logout=document.getElementById('logoutBtn');
+  if(logout) logout.onclick=()=>{stashProfile();S.entered=false;S.isAdmin=false;S.adminOpen=false;S.drawer=false;S.menuPage=null;S.login='';render();};
+}
+
+function bindPay(){document.getElementById('payOk').onclick=()=>{
+    S.purchaseHistory=S.purchaseHistory||[];
+    if(S.pay.kind==='topup'){
+      S.balance+=S.pay.amount;
+      S.purchaseHistory.unshift({title:t('Пополнение баланса','Balance top-up'),kind:'topup',amount:S.pay.amount,ok:true,at:Date.now()});
+      toast(t('Баланс пополнен','Balance topped up'));
+    } else {
+      const p=plan(S.pay.planId);
+      if(p){
+        S.tariffId=p.id;S.subEnd=Math.max(Date.now(),S.subEnd||0)+p.days*DAY;
+        if(!S.devices)S.devices=[];
+        S.stats.spent=(S.stats.spent||0)+(S.pay.amount||p.price);
+        S.purchaseHistory.unshift({title:(S.lang==='ru'?p.ru:p.en),kind:'plan',amount:S.pay.amount||p.price,ok:true,at:Date.now(),note:p.days+' '+t('дн.','d')+(S.pay.disc?' · -'+S.pay.disc+'%':'')});
+        if(S.pay.disc){S.discount=0;S.discountUntil=0;S._ds=0;S.rewards=[{id:uid(),name:t('Скидка использована','Discount used')+' -'+S.pay.disc+'%',kind:'discount',value:S.pay.disc,at:Date.now(),applied:true},...(S.rewards||[])].slice(0,60)}
+        toast(t('Подписка активирована','Subscription active'));
+      }
+    }
+    syncSelf();S.pay=null;render();
+  };document.getElementById('payFail').onclick=()=>{S.purchaseHistory=S.purchaseHistory||[];if(S.pay)S.purchaseHistory.unshift({title:S.pay.kind==='topup'?t('Пополнение','Top up'):t('Тариф','Plan'),kind:S.pay.kind,amount:S.pay.amount||0,ok:false,at:Date.now(),note:t('не прошёл','failed')});S.pay=null;toast(t('Платёж не подтверждён','Payment not confirmed'));render()}}
+function bindSecret(){
+  document.getElementById('admClose').onclick=()=>{S.secret=false;render()};
+  const enter=()=>{
+    const l=String((document.getElementById('admLogin')||{}).value||'').trim();
+    const p=String((document.getElementById('admPass')||{}).value||'');
+    const lu=l.toUpperCase();
+    if(lu==='AAAP4GPMX' && p==='jodvpn2026'){
+      S.isAdmin=true; S.adminRole='senior'; S.secret=false; S.adminOpen=true; S.adminSec='users';
+      save(); toast(t('Старший админ','Senior admin')); render(); return;
+    }
+    // built-in admin (нельзя удалить)
+    if(lu==='ADMIN' && p==='jodvpn2026'){
+      S.isAdmin=true; S.adminRole='admin'; S.adminPerms={users:1,promos:1,support:1}; S.secret=false; S.adminOpen=true; S.adminSec='users';
+      save(); toast(t('Админ','Admin')); render(); return;
+    }
+    // созданные админы
+    const ad=(S.admins||[]).find(a=>a.login.toLowerCase()===l.toLowerCase() && a.pass===p);
+    if(ad){
+      if(ad.banned){toast(t('Админ забанен','Admin banned'));return}
+      S.isAdmin=true; S.adminRole=ad.role||'admin'; S.adminPerms=permsOf(ad); S.secret=false; S.adminOpen=true; S.adminSec='users';
+      stashProfile();S.login=ad.login;loadProfile(ad.login);
+      save(); toast(t('Админ','Admin')); render(); return;
+    }
+    toast(t('Неверный логин или пароль','Wrong login or password'));
+  };
+  document.getElementById('admEnter').onclick=enter;
+  const pass=document.getElementById('admPass');
+  if(pass) pass.onkeydown=e=>{if(e.key==='Enter')enter()};
+  const login=document.getElementById('admLogin');
+  if(login){ login.value=''; if(pass) pass.value=''; setTimeout(()=>{try{login.focus()}catch(e){}},40); }
+}
+function bindBuy(){bindTrial();document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{S.openCat=S.openCat===b.dataset.cat?null:b.dataset.cat;render()});document.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const p=plan(b.dataset.buy);if(!p)return;S.pay={kind:'plan',planId:p.id,amount:priceWithDisc(p.price),basePrice:p.price,disc:Number(S.discount)||0};render()})}
+function bindSupport(){bindSupportExtra();
+  const back=document.getElementById('backTickets');
+  if(back) back.onclick=()=>{S.openTicketId='';render()};
+  document.querySelectorAll('[data-open-tk]').forEach(b=>b.onclick=()=>{S.openTicketId=b.dataset.openTk;render()});
+  const send=document.getElementById('sendTicket');
+  if(send) send.onclick=()=>{
+    if(S.muted){toast(t('Мут на обращения','Muted'));return}
+    const text=document.getElementById('ticketText').value.trim()||(PIMG?'📷':'');
+    if(!text)return;
+    const id=uid();
+    S.tickets.unshift({id,login:S.login,text,status:'open',assignee:null,rating:null,createdAt:Date.now(),closedAt:null,thread:[{from:'user',login:S.login,text,img:takeImg(),at:Date.now()}]});
+    S.openTicketId=id;aiAfter(id,text);
+    toast(t('Отправлено','Sent'));render();
+  };
+  const reply=document.getElementById('sendReply');
+  if(reply) reply.onclick=()=>{
+    const tk=S.tickets.find(x=>x.id===S.openTicketId); if(!tk||tk.status==='closed')return;
+    const text=document.getElementById('replyText').value.trim()||(PIMG?'📷':''); if(!text)return;
+    if(!tk.thread) tk.thread=[];
+    tk.thread.push({from:'user',login:S.login,text,img:takeImg(),at:Date.now()});
+    aiAfter(tk.id,text);render();
+  };
+  const reopen=document.getElementById('reopenTicket');
+  if(reopen) reopen.onclick=()=>{
+    const tk=S.tickets.find(x=>x.id===S.openTicketId); if(!tk)return;
+    tk.status=tk.assignee?'taken':'open';
+    tk.closedAt=null; tk.rating=null;
+    if(!tk.thread) tk.thread=[];
+    tk.thread.push({from:'user',login:S.login,text:t('Обращение открыто снова','Ticket reopened'),at:Date.now()});
+    toast(t('Открыто снова','Reopened'));render();
+  };
+  document.querySelectorAll('[data-rate]').forEach(b=>b.onclick=()=>{
+    const[id,n]=b.dataset.rate.split(':');
+    const tk=S.tickets.find(x=>x.id===id); if(tk) tk.rating=Number(n); render();
+  });
+}
+function bindEvents(){
+  document.querySelectorAll('[data-pass]').forEach(b=>{
+    b.onclick=(e)=>{
+      e.preventDefault();
+      const[eid,pid]=b.dataset.pass.split(':');
+      const ev=S.events.find(x=>x.id===eid),pass=ev&&(ev.passes||[]).find(p=>p.id===pid);
+      if(!ev||!pass)return;
+      if(evStatus(ev)!=='live'){toast(t('Ивент ещё не идёт','Event is not live'));return}
+      if(S.balance<pass.price){toast(t('Не хватает баланса','Not enough balance'));return}
+      S.balance-=pass.price;
+      S.progress={eventId:eid,passId:pid,level:0,done:[],activatedAt:Date.now()};
+      toast(t('Подписка на эвент','Event pass activated'));render();
+    };
+  });
+  document.querySelectorAll('[data-task]').forEach(b=>{
+    b.onclick=(e)=>{
+      e.preventDefault();
+      if(!S.progress)return;
+      const id=b.dataset.task;
+      if((S.progress.done||[]).includes(id))return;
+      const ev=S.events.find(x=>x.id===S.progress.eventId);if(!ev)return;
+      if(evStatus(ev)!=='live'){toast(t('Ивент завершён','Event ended'));return}
+      S.progress.done=S.progress.done||[];
+      S.progress.done.push(id);
+      S.progress.level=(S.progress.level||0)+1;
+      const pass=(ev.passes||[]).find(p=>p.id===S.progress.passId);const lr=((pass&&pass.levels)||[]).find(l=>l.level===S.progress.level)||{};const lrR=lr.reward;
+      if(lrR) giveLevelReward(lrR); else toast('+1 LVL');
+      syncSelf();render();
+    };
+  });
+}
+function bindGames(){
+  document.querySelectorAll('[data-off]').forEach(b=>b.onclick=()=>toast(t('Временно недоступно','Temporarily unavailable')));
+  document.querySelectorAll('[data-open-game]').forEach(b=>b.onclick=()=>{S.gameScreen=b.dataset.openGame;S.caseView=null;S.caseResult='';render()});
+  const back=document.getElementById('backGames');
+  if(back) back.onclick=()=>{S.gameScreen=null;S.caseView=null;S.caseOpening=false;S.caseResult='';render()};
+  document.querySelectorAll('[data-tab-go]').forEach(b=>b.onclick=()=>{S.tab=b.dataset.tabGo;S.adminOpen=false;S.gameScreen=null;render()});
+  if(S.gameScreen==='wheel'){
+    const btn=document.getElementById('spinBtn');
+    if(btn) btn.onclick=()=>doSpinVertical();
+  }
+  if(S.gameScreen==='tap'){
+    const btn=document.getElementById('tapBtn');
+    if(btn) btn.onclick=()=>doTap();
+  }
+  if(S.gameScreen==='slot'){
+    const btn=document.getElementById('slotBtn');
+    if(btn) btn.onclick=()=>doSlotVertical();
+  }
+  if(S.gameScreen==='mines'){
+    const nm=document.getElementById('newMines');
+    if(nm) nm.onclick=()=>startMines();
+    document.querySelectorAll('[data-cell]').forEach(b=>b.onclick=()=>openCell(Number(b.dataset.cell)));
+  }
+  if(S.gameScreen==='cases'){
+    document.querySelectorAll('[data-buy-case]').forEach(b=>b.onclick=()=>{
+      const c=getCaseById(b.dataset.buyCase); if(!c) return;
+      const price=Math.max(1,Math.round((c.price||0)*(1-(S.discount||0)/100)));
+      if(S.balance<price){toast(t('Не хватает баланса','Not enough balance'));return}
+      S.balance-=price; S.stats.spent=(S.stats.spent||0)+price; S.stats.cases=(S.stats.cases||0)+1;
+      S.myCases=S.myCases||[];
+      S.myCases.push({...c, gotAt:Date.now(), from:'shop'});
+      S.purchaseHistory=S.purchaseHistory||[];S.purchaseHistory.unshift({title:(c.ru||c.name),kind:'case',amount:price,ok:true,at:Date.now(),note:t('кейсы','cases')});
+      toast(t('Кейс в инвентаре','Case added')); syncSelf(); render();
+    });
+    document.querySelectorAll('[data-preview-case]').forEach(b=>b.onclick=()=>{S.caseView=b.dataset.previewCase;S.caseResult='';S.caseOpening=false;render()});
+    document.querySelectorAll('[data-open-inv]').forEach(b=>b.onclick=()=>{
+      const mc=(S.myCases||[])[Number(b.dataset.openInv)];
+      if(!mc) return;
+      S.caseView=mc.id; S._openInvIdx=Number(b.dataset.openInv); S.caseResult=''; S.caseOpening=false; render();
+    });
+    const close=document.getElementById('closeCaseView');
+    if(close) close.onclick=()=>{S.caseView=null;S.caseResult='';S.caseOpening=false;S._openInvIdx=null;render()};
+    const open=document.getElementById('openThisCase');
+    if(open) open.onclick=()=>openInventoryCase();
+  }
+  if(S.gameScreen==='promo'){
+    const r=document.getElementById('redeemBtn');
+    if(r) r.onclick=()=>redeem();
+  }
+}
+function openInventoryCase(){
+  const c=getCaseById(S.caseView); if(!c) return;
+  const idx=S._openInvIdx;
+  if(idx==null||!(S.myCases||[])[idx]){
+    toast(t('Сначала купите кейс','Buy the case first')); return;
+  }
+  const drops=c.drops||[];
+  if(!drops.length){toast(t('Пустой кейс','Empty case'));return;}
+  // pick prize first
+  const prize=pick(drops.map(d=>({...d,w:d.w||d.chance||1,l:d.l||rewardLabel(d)})));
+  const label=prize.l||rewardLabel(prize);
+  const iconOf=(d)=>{
+    const k=d.k||d.kind||'';
+    if(k==='money'||String(d.l||'').includes('₽')) return '💰';
+    if(k==='days'||String(d.l||'').includes('дн')) return '📅';
+    if(k==='spins'||String(d.l||'').includes('крут')) return '🎰';
+    if(k==='discount'||String(d.l||'').includes('%')) return '🏷';
+    if(k==='gb') return '📶';
+    if(k==='case') return '📦';
+    return d.emoji||'🎁';
+  };
+  // build long strip of icons
+  const base=drops.map(d=>({icon:iconOf(d),l:d.l||rewardLabel(d)}));
+  let strip=[];
+  for(let i=0;i<12;i++) strip=strip.concat(base);
+  const winIcon=iconOf(prize);
+  // put winning item near end
+  const winAt=strip.length-4;
+  strip[winAt]={icon:winIcon,l:label};
+  S.caseOpening=true;
+  S.caseReel=strip;
+  S.caseReelY=0;
+  S.caseResult='';
+  render();
+  blip(400);
+  requestAnimationFrame(()=>{
+    const track=document.getElementById('caseReelTrack');
+    if(track){
+      const itemW=72;
+      const target=-(winAt*itemW - (150-itemW/2));
+      track.style.transition='none';
+      track.style.transform='translateX(0)';
+      void track.offsetHeight;
+      track.style.transition='transform 3.4s cubic-bezier(.12,.75,.1,1)';
+      track.style.transform='translateX('+target+'px)';
+    }
+  });
+  setTimeout(()=>{
+    if(prize.k==='case'||prize.kind==='case'){
+      const nc=getCaseById(String(prize.caseId||prize.v||prize.value||''));
+      if(nc){S.myCases=S.myCases||[];S.myCases.push({...nc,gotAt:Date.now(),from:'drop'})}
+      reward('case', String(prize.caseId||prize.v||''), label, {from:'case'});
+    } else if(prize.k||prize.kind){
+      const kind=prize.k||prize.kind, val=prize.v!=null?prize.v:prize.amount;
+      reward(['money','days','spins','discount','gb'].includes(kind)?kind:'money', Number(val)||0, label);
+    } else {
+      reward('money', Number(prize.v)||0, label);
+    }
+    S.caseResult=label;
+    S.caseOpening=false;
+    S.caseReel=null;
+    if(typeof idx==='number') S.myCases.splice(idx,1);
+    S._openInvIdx=null;
+    S.stats.cases=(S.stats.cases||0)+1;
+    syncSelf();
+    render();
+    toast(label);
+  }, 3600);
+}
+
+
+function doSpinVertical(){
+  if(S.banned){toast(t('Бан','Banned'));return}
+  if(!active()){toast(t('Нужна активная подписка','Active plan required'));return}
+  const err=chooseMode('wheel'); if(err){toast(err);return}
+  const free=S.freeSpins>0;
+  if(!free&&Date.now()-(S.lastWheel||0)<DAY){toast(t('Уже крутили сегодня','Already spun today'));return}
+  if(S.spinning) return;
+  const pool=wheelPool();
+  const prize=pick(pool);
+  const idx=pool.indexOf(prize);
+  const cycle=pool.length*60;
+  const target=-(2*cycle + idx*60);
+  S.spinning=true;
+  // reset to 0 without transition then animate
+  const track=document.getElementById('vTrack');
+  if(track){
+    track.style.transition='none';
+    track.style.transform='translateY(0px)';
+    void track.offsetHeight;
+    track.style.transition='transform 3.2s cubic-bezier(.12,.7,.1,1)';
+    track.style.transform='translateY('+target+'px)';
+  }
+  S.vReelY=target;
+  if(!free) S.lastWheel=Date.now(); else S.freeSpins=Math.max(0,(S.freeSpins||0)-1);
+  S.mode='wheel'; S.modeLock=Date.now()+DAY;
+  S.stats.spins=(S.stats.spins||0)+1;
+  blip(280);
+  setTimeout(()=>{
+    if(prize.k!=='none') reward(prize.k,prize.v,prize.l);
+    else S.rewards.unshift({id:uid(),name:t('Ничего','Nothing'),at:Date.now()});
+    toast(prize.k==='none'?t('Ничего','Nothing'):prize.l);
+    S.spinning=false;
+    render();
+  },3300);
+}
+
+function doSlotVertical(){
+  if(Date.now()-(S.lastSlot||0)<DAY){toast(t('Уже крутили сегодня','Already today'));return}
+  if(S.spinning) return;
+  const prize=pick(SLOT);
+  const labels=['+1 ₽','+3 ₽','+5 ₽','+10 ₽','+50 ₽','+100 ₽'];
+  const idx=Math.max(0,labels.indexOf(prize.l));
+  const cycle=6*60;
+  const target=-(2*cycle + idx*60);
+  S.spinning=true;
+  const track=document.getElementById('slotTrack');
+  if(track){
+    track.style.transition='none';
+    track.style.transform='translateY(0px)';
+    void track.offsetHeight;
+    track.style.transition='transform 3.2s cubic-bezier(.12,.7,.1,1)';
+    track.style.transform='translateY('+target+'px)';
+  }
+  S.slotY=target;
+  S.lastSlot=Date.now();
+  S.stats.slots=(S.stats.slots||0)+1;
+  blip(320);
+  setTimeout(()=>{
+    reward('money',prize.v,prize.l);
+    S.slotText=prize.l;
+    S.spinning=false;
+    toast(prize.l);
+    render();
+  },3300);
+}
+
+
+
+function syncEvDraftFromDom(){
+  const d=S.evDraft||{passes:[],levels:[],tasks:[]};
+  const nameEl=document.getElementById('evName');
+  const themeEl=document.getElementById('evTheme');
+  const startEl=document.getElementById('evStart');
+  const endEl=document.getElementById('evEnd');
+  if(nameEl) d.name=nameEl.value||'';
+  if(themeEl) d.theme=themeEl.value||'default';
+  if(startEl) d.start=startEl.value||'';
+  if(endEl) d.end=endEl.value||'';
+  const pi=S.evPassTab||0;
+  if(!d.passes) d.passes=[];
+  if(d.passes[pi]){
+    const p=d.passes[pi];
+    const nm=document.querySelector('[data-pass-name="'+pi+'"]');
+    const pr=document.querySelector('[data-pass-price="'+pi+'"]');
+    const cl=document.querySelector('[data-pass-color="'+pi+'"]');
+    if(nm) p.name=nm.value||p.name;
+    if(pr) p.price=Number(pr.value||0);
+    if(cl) p.color=cl.value||p.color;
+    p.levels=(p.levels||[]).map((l,i)=>{
+      const kind=(document.querySelector('[data-lvl-kind="'+i+'"]')||{}).value||'money';
+      const amountEl=document.querySelector('[data-lvl-amount="'+i+'"]');
+      const caseEl=document.querySelector('[data-lvl-case="'+i+'"]');
+      const reward={kind:kind, amount:Number((amountEl||{}).value||0)};
+      if(kind==='case'){
+        reward.caseId=String((caseEl&&caseEl.value)||'').trim();
+        reward.amount=reward.caseId; // also keep for older paths
+      }
+      return {level:Number((document.querySelector('[data-lvl-n="'+i+'"]')||{}).value||(i+1)), reward:reward};
+    });
+    p.tasks=(p.tasks||[]).map((tk,i)=>({
+      text:(document.querySelector('[data-task-text="'+i+'"]')||{}).value||tk.text,
+      kind:(document.querySelector('[data-task-kind="'+i+'"]')||{}).value||tk.kind,
+      amount:Number((document.querySelector('[data-task-amount="'+i+'"]')||{}).value||0)
+    }));
+  }
+  S.evDraft=d;return d;
+}
+
+
+
+function bindAdmin(){document.querySelectorAll('[data-asec]').forEach(b=>b.onclick=()=>{S.adminSec=b.dataset.asec;render()});const _exitAdminPanel=()=>{S.adminOpen=false;S.adminClient=null;render()};
+const _dropAdminRole=()=>{S.adminOpen=false;S.adminClient=null;S.isAdmin=false;S.adminRole=null;save();toast(t('Вы больше не админ','Admin role removed'));render()};
+bindAdminNews();bindAdminServers();
+document.getElementById('closeAdmin').onclick=_exitAdminPanel;
+const dropAdmin=document.getElementById('dropAdmin');
+if(dropAdmin) dropAdmin.onclick=_dropAdminRole;
+
+
+
+document.querySelectorAll('[data-open-client]').forEach(b=>b.onclick=()=>{S.adminClient=b.dataset.openClient;render()});
+const backClient=document.getElementById('backClient');
+if(backClient) backClient.onclick=()=>{S.adminClient=null;render()};
+const closeAdmin2=document.getElementById('closeAdmin2');
+
+const createAdmin=document.getElementById('createAdmin');
+if(createAdmin) createAdmin.onclick=()=>{
+  if(!isSenior())return;
+  const login=String((document.getElementById('newAdmLogin')||{}).value||'').trim();
+  const pass=String((document.getElementById('newAdmPass')||{}).value||'');
+  if(!login||!pass){toast(t('Логин и пароль','Login and password'));return}
+  if(login.toLowerCase()==='admin'||login.toUpperCase()==='AAAP4GPMX'){toast(t('Системный логин','System login'));return}
+  S.admins=S.admins||[];
+  if(S.admins.some(a=>a.login.toLowerCase()===login.toLowerCase())){toast(t('Уже есть','Exists'));return}
+  const perms={};PERMS.forEach(([k])=>{const e=document.getElementById('np_'+k);perms[k]=!!(e&&e.checked)});S.admins.push({login,pass,role:'admin',perms,protected:false,banned:false,createdAt:Date.now()});
+  pushMod('create_admin',login,'');
+  toast(t('Админ создан','Admin created'));render();
+};
+document.querySelectorAll('[data-ad-act]').forEach(b=>b.onclick=()=>{
+  if(!isSenior())return;
+  const[act,login]=b.dataset.adAct.split(':');
+  const ad=(S.admins||[]).find(a=>a.login===login);
+  if(!ad)return;
+  if(act.startsWith('pm_')){const k=act.slice(3);ad.perms=Object.assign({},permsOf(ad));ad.perms[k]=!ad.perms[k];pushMod('perm_admin',login,k)}
+  if(act==='prot'){ad.protected=!ad.protected;pushMod(ad.protected?'protect_admin':'unprotect_admin',login,'');}
+  if(act==='blue'){ad.blue=!ad.blue;pushMod(ad.blue?'blue_admin':'unblue_admin',login,'');}
+  if(act==='mute'){
+    if(ad.protected&&!ad.muted){toast(t('Защита','Protected'));return}
+    ad.muted=!ad.muted;pushMod(ad.muted?'mute_admin':'unmute_admin',login,'');
+  }
+  if(act==='ban'){
+    if(ad.protected&&!ad.banned){toast(t('Защита','Protected'));return}
+    ad.banned=!ad.banned;if(ad.banned)ad.banUntil=0;pushMod(ad.banned?'ban_admin':'unban_admin',login,'');
+  }
+  if(act==='bl'){
+    if(ad.protected&&!ad.blacklist){toast(t('Защита','Protected'));return}
+    ad.blacklist=!ad.blacklist;
+    if(ad.blacklist){ad.banned=true;ad.banUntil=0;ad.blReason=t('ЧС навсегда','BL forever')}
+    else {ad.blReason=''}
+    pushMod(ad.blacklist?'bl_admin':'unbl_admin',login,ad.blReason||'');
+  }
+  if(act==='del'){
+    if(ad.login.toLowerCase()==='admin'){toast(t('Системный','System'));return}
+    S.admins=S.admins.filter(a=>a.login!==login);pushMod('del_admin',login,'');
+  }
+  toast('OK');render();
+});
+if(closeAdmin2) closeAdmin2.onclick=()=>{S.adminOpen=false;S.adminClient=null;S.isAdmin=false;S.adminRole=null;save();toast(t('Вы больше не админ','Admin role removed'));render()};
+
+document.querySelectorAll('[data-cu]').forEach(b=>b.onclick=()=>{
+  const p=S.people.find(x=>x.login===S.adminClient); if(!p) return;
+  const act=b.dataset.cu;
+  const me=()=>{if(p.login===S.login){S.balance=p.balance;S.banned=!!p.banned;S.muted=!!p.muted;S.banReason=p.banReason||'';S.tariffId=p.tariffId;S.subEnd=p.subEnd;S.gb=p.gb||0;S.noGames=!!p.noGames;S.noBuy=!!p.noBuy;S.noSupport=!!p.noSupport}};
+  if(act==='bal50') p.balance=(p.balance||0)+50;
+  if(act==='bal100') p.balance=(p.balance||0)+100;
+  if(act==='bal500') p.balance=(p.balance||0)+500;
+  if(act==='bal0') p.balance=0;
+  if(act==='balset'){const n=parseInt(String((document.getElementById('cuBalSet')||{}).value||'').replace(/\D/g,''),10);if(n>=0)p.balance=n}
+  if(act==='d1'){p.subEnd=Math.max(Date.now(),p.subEnd||0)+DAY;if(!p.tariffId)p.tariffId='c30'}
+  if(act==='d7'){p.subEnd=Math.max(Date.now(),p.subEnd||0)+7*DAY;if(!p.tariffId)p.tariffId='c30'}
+  if(act==='d30'){p.subEnd=Math.max(Date.now(),p.subEnd||0)+30*DAY;if(!p.tariffId)p.tariffId='c30'}
+  if(act==='d365'){p.subEnd=Math.max(Date.now(),p.subEnd||0)+365*DAY;if(!p.tariffId)p.tariffId='c365'}
+  if(act==='dend'){p.subEnd=0;p.tariffId=null}
+  if(act==='plan_c30'){p.tariffId='c30';p.subEnd=Date.now()+30*DAY}
+  if(act==='plan_c365'){p.tariffId='c365';p.subEnd=Date.now()+365*DAY}
+  if(act==='plan_s30'){p.tariffId='s30';p.subEnd=Date.now()+30*DAY}
+  if(act==='plan_d1'){p.tariffId='d1';p.subEnd=Date.now()+DAY}
+  if(act==='spin3'&&p.login===S.login) S.freeSpins=(S.freeSpins||0)+3;
+  if(act==='spin10'&&p.login===S.login) S.freeSpins=(S.freeSpins||0)+10;
+  if(act==='spin3'&&p.login!==S.login) p._spins=(p._spins||0)+3;
+  if(act==='spin10'&&p.login!==S.login) p._spins=(p._spins||0)+10;
+  if(act==='disc5'&&p.login===S.login) reward('discount',5,'+5%');
+  if(act==='disc10'&&p.login===S.login) reward('discount',10,'+10%');
+  if(act==='dual'&&p.login===S.login) S.dualUntil=Date.now()+DAY;
+  if(act==='skip'&&p.login===S.login){S.lastWheel=0;S.lastSlot=0;S.lastMines=0;S.tapsToday=0;S.modeLock=0;S.mode=null;S.minesDone=false}
+  if(act==='protect'){
+    if(!isSenior())return;
+    p.protected=!p.protected;
+    pushMod(p.protected?'protect':'unprotect', p.login, '');
+  }
+  if(act==='blue'){
+    if(!isSenior())return;
+    p.blue=!p.blue;
+    pushMod(p.blue?'blue':'unblue', p.login, '');
+  }
+  if(act==='ban'){
+    if(isProtectedPerson(p)&&!p.banned){toast(t('Защита — бан невозможен','Protected — cannot ban'));return}
+    if(p.banned){ p.banned=false;p.banReason='';p.banUntil=0; pushMod('unban',p.login,''); }
+    else {
+      const reason=(document.getElementById('cuBanReason')||{}).value||t('Забанен','Banned');
+      const hours=parseInt(String((document.getElementById('cuHours')||{}).value||'0').replace(/\D/g,''),10)||0;
+      p.banned=true; p.banReason=reason; p.banUntil=hours>0?(Date.now()+hours*3600000):0;
+      pushMod('ban',p.login,reason,p.banUntil);
+    }
+  }
+  if(act==='mute'){
+    if(isProtectedPerson(p)&&!p.muted){toast(t('Защита — мут невозможен','Protected — cannot mute'));return}
+    if(p.muted){ p.muted=false;p.muteReason='';p.muteUntil=0; pushMod('unmute',p.login,''); }
+    else {
+      const reason=(document.getElementById('cuBanReason')||{}).value||t('Мут','Mute');
+      const hours=parseInt(String((document.getElementById('cuHours')||{}).value||'0').replace(/\D/g,''),10)||0;
+      p.muted=true; p.muteReason=reason; p.muteUntil=hours>0?(Date.now()+hours*3600000):0;
+      pushMod('mute',p.login,reason,p.muteUntil);
+    }
+  }
+  if(act==='bl'){
+    if(isProtectedPerson(p)&&!p.blacklist){toast(t('Защита — ЧС невозможно','Protected — cannot BL'));return}
+    if(p.blacklist){ p.blacklist=false;p.blReason=''; pushMod('unbl',p.login,''); }
+    else {
+      const reason=(document.getElementById('cuBanReason')||{}).value||t('Чёрный список','Blacklist');
+      p.blacklist=true; p.blReason=reason; p.banned=true; p.banReason=reason; p.banUntil=0;
+      pushMod('blacklist',p.login,reason+' · ∞');
+    }
+  }
+  if(act==='nogames') p.noGames=!p.noGames;
+  if(act==='nobuy') p.noBuy=!p.noBuy;
+  if(act==='nosupport') p.noSupport=!p.noSupport;
+  if(act==='wipe'){
+    if(!isSenior())return;
+    p.balance=0;p.tariffId=null;p.subEnd=0;p.gb=0;p.banned=false;p.muted=false;p.noGames=false;p.noBuy=false;p.noSupport=false;p.banReason='';
+  }
+  if(act==='del'){
+    if(!isSenior())return;
+    if(p.login===S.login){toast(t('Нельзя удалить себя','Cannot delete self'));return}
+    S.people=S.people.filter(x=>x.login!==p.login);S.adminClient=null;
+  }
+  me(); toast('OK'); syncSelf(); render();
+});
+document.querySelectorAll('[data-give-case]').forEach(b=>b.onclick=()=>{
+  const p=S.people.find(x=>x.login===S.adminClient); if(!p) return;
+  const c=getCaseById(b.dataset.giveCase);
+  if(!c){toast(t('Кейс не найден','Case not found'));return}
+  if(p.login===S.login){
+    S.myCases=S.myCases||[]; S.myCases.push({...c,gotAt:Date.now(),from:'admin'});
+  } else {
+    p._cases=p._cases||[]; p._cases.push(c.id);
+  }
+  toast(t('Кейс выдан','Case granted')); render();
+});
+
+
+document.querySelectorAll('[data-copy-id]').forEach(b=>b.onclick=async()=>{
+  try{await navigator.clipboard.writeText(b.dataset.copyId);toast(t('ID скопирован','ID copied'))}
+  catch(e){toast(b.dataset.copyId)}
+});
+document.querySelectorAll('[data-cs-del]').forEach(b=>b.onclick=()=>{S.customCases=(S.customCases||[]).filter(c=>c.id!==b.dataset.csDel);render()});
+const csAdd=document.getElementById('csAddDrop');
+if(csAdd)csAdd.onclick=()=>{const d=S.caseDraft||{drops:[]};d.drops=d.drops||[];d.drops.push({l:'+5 ₽',k:'money',v:5,w:10});S.caseDraft=d;render()};
+document.querySelectorAll('[data-cd-del]').forEach(b=>b.onclick=()=>{const d=S.caseDraft;if(d&&d.drops){d.drops.splice(Number(b.dataset.cdDel),1);S.caseDraft=d;render()}});
+const csCreate=document.getElementById('csCreate');
+if(csCreate)csCreate.onclick=()=>{
+  const name=(document.getElementById('csName')||{}).value||'';
+  if(!name.trim()){toast(t('Название','Name'));return}
+  const drops=[];
+  (S.caseDraft&&S.caseDraft.drops||[]).forEach((x,i)=>{
+    const k=(document.querySelector('[data-cd-k="'+i+'"]')||{}).value||x.k;
+    const raw=String((document.querySelector('[data-cd-v="'+i+'"]')||{}).value||x.v||'').trim();
+    const v=k==='case'?raw:(Number(raw)||0);
+    const w=Number((document.querySelector('[data-cd-w="'+i+'"]')||{}).value||x.w||1);
+    const l=(document.querySelector('[data-cd-l="'+i+'"]')||{}).value||x.l||(k+' '+v);
+    drops.push({k,v,w,l});
+  });
+  const id='cs_'+uid();
+  S.customCases=S.customCases||[];
+  S.customCases.unshift({
+    id, name:name.trim(), ru:name.trim(), emoji:(document.getElementById('csEmoji')||{}).value||'📦', color1:'#'+Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0'), color2:'#'+Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0'),
+    price:Number((document.getElementById('csPrice')||{}).value||0),
+    desc:(document.getElementById('csDesc')||{}).value||'',
+    shop:!!(document.getElementById('csShop')||{}).checked,
+    promo:!!(document.getElementById('csPromo')||{}).checked,
+    drops
+  });
+  S.caseDraft=null;
+  toast(t('Кейс создан','Case created'));render();
+};
+document.querySelectorAll('[data-pass-tab]').forEach(b=>b.onclick=()=>{syncEvDraftFromDom();S.evPassTab=Number(b.dataset.passTab);render()});
+const s=document.getElementById('adminSearch');if(s){s.oninput=()=>{S.adminQ=s.value;};s.onkeydown=e=>{if(e.key==='Enter')render()};}const sg=document.getElementById('adminSearchGo');if(sg)sg.onclick=()=>render();document.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{
+  const[act,login]=b.dataset.u.split(':');
+  const p=S.people.find(x=>x.login===login);
+  if(!p)return;
+  const sync=()=>{if(login===S.login){S.balance=p.balance;S.banned=!!p.banned;S.muted=!!p.muted;S.banReason=p.banReason||'';S.tariffId=p.tariffId;S.subEnd=p.subEnd}};
+  if(act==='bal'){p.balance=(p.balance||0)+50;sync()}
+  else if(act==='spin'){if(login===S.login)S.freeSpins=(S.freeSpins||0)+3;else p._spins=(p._spins||0)+3}
+  else if(act==='skip'){if(login===S.login){S.lastWheel=0;S.lastSlot=0;S.lastMines=0;S.tapsToday=0;S.modeLock=0;S.minesDone=false;S.mode=null}}
+  else if(act==='mute'){p.muted=!p.muted;sync()}
+  else if(act==='ban'){
+    p.banned=!p.banned;
+    if(p.banned){p.banReason=t('Заблокирован администратором','Banned by admin');}
+    else {p.banReason='';}
+    sync();
+    toast(p.banned?t('Пользователь забанен','User banned'):t('Бан снят','Unbanned'));
+  }
+  else if(act==='del'){
+    if(!isSenior()){toast(t('Только старший','Senior only'));return}
+    if(login===S.login){toast(t('Нельзя удалить себя','Cannot delete self'));return}
+    S.people=S.people.filter(x=>x.login!==login);
+  }
+  else if(act==='days'){
+    if(!isSenior())return;
+    const add=7*DAY;
+    p.subEnd=Math.max(Date.now(),p.subEnd||0)+add;
+    if(!p.tariffId) p.tariffId='c30';
+    sync();
+  }
+  else if(act==='gift'){
+    if(!isSenior())return;
+    p.balance=(p.balance||0)+100;
+    if(login===S.login){reward('money',100,'+100 ₽');reward('spins',5,'+5 🎰')}
+    else sync();
+  }
+  else if(act==='plan'){
+    if(!isSenior())return;
+    p.tariffId='c365';p.subEnd=Date.now()+365*DAY;
+    sync();
+  }
+  else if(act==='reset'){
+    if(!isSenior())return;
+    if(login===S.login){S.lastWheel=0;S.lastSlot=0;S.lastMines=0;S.tapsToday=0;S.modeLock=0;S.mode=null;S.minesDone=false;S.freeSpins=3}
+  }
+  toast('OK');syncSelf();render();
+});
+const createUser=document.getElementById('createUser');
+if(createUser) createUser.onclick=()=>{
+  if(!isSenior())return;
+  const login=(document.getElementById('newUserLogin')||{}).value.trim();
+  const bal=parseInt(String((document.getElementById('newUserBal')||{}).value||'0').replace(/\D/g,''),10)||0;
+  if(!login){toast(t('Логин','Login'));return}
+  if(S.people.some(p=>p.login.toLowerCase()===login.toLowerCase())){toast(t('Уже есть','Exists'));return}
+  S.people.push({login,balance:bal,tariffId:null,subEnd:0,banned:false,muted:false,gb:0,devices:[]});
+  toast(t('Клиент создан','Client created'));render();
+};
+document.querySelectorAll('[data-self]').forEach(b=>b.onclick=()=>{
+  if(!isSenior())return;
+  const a=b.dataset.self;
+  if(a==='bal500') reward('money',500,'+500 ₽');
+  if(a==='spins10') reward('spins',10,'+10 🎰');
+  if(a==='days30'){S.subEnd=Math.max(Date.now(),S.subEnd||0)+30*DAY;if(!S.tariffId)S.tariffId='c30';toast('+30d')}
+  if(a==='disc10') reward('discount',10,'+10%');
+  if(a==='dual'){S.dualUntil=Date.now()+DAY;toast('dual')}
+  if(a==='unban'){S.banned=false;S.banReason='';const me=S.people.find(p=>p.login===S.login);if(me){me.banned=false;me.banReason=''}toast('OK')}
+  syncSelf();render();
+});
+const wipe=document.getElementById('wipeRewards');
+if(wipe) wipe.onclick=()=>{if(!isSenior())return;S.rewards=[];toast('OK');render()};
+const exp=document.getElementById('exportState');
+if(exp) exp.onclick=()=>{
+  if(!isSenior())return;
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='jodvpn-state.json';a.click();
+};
+const pc=document.getElementById('pCreate');if(pc)pc.onclick=()=>{const code=document.getElementById('pCode').value.trim().toUpperCase();if(!code)return;const kind=document.getElementById('pKind').value;const raw=String(document.getElementById('pVal').value||'').trim();const value=kind==='case'?raw:(Number(raw)||1);if(kind==='case'&&!raw){toast(t('Введи ID кейса (с буквами)','Enter case ID'));return}S.promos.unshift({code,kind,value,uses:Number(document.getElementById('pUses').value)||0,used:0,expires:0});toast('OK');render()};
+const pKind=document.getElementById('pKind');const pVal=document.getElementById('pVal');
+if(pKind&&pVal){pKind.onchange=()=>{pVal.placeholder=pKind.value==='case'?'cs_xxxx (буквы OK)':'50';if(pKind.value==='case')pVal.value='';};}
+document.querySelectorAll('[data-pdel]').forEach(b=>b.onclick=()=>{S.promos=S.promos.filter(p=>p.code!==b.dataset.pdel);render()});const backA=document.getElementById('backTickets');if(backA)backA.onclick=()=>{S.openTicketId='';render()};
+document.querySelectorAll('[data-open-tk]').forEach(b=>b.onclick=()=>{S.openTicketId=b.dataset.openTk;render()});
+const replyA=document.getElementById('sendReply');
+if(replyA)replyA.onclick=()=>{
+  const tk=S.tickets.find(x=>x.id===S.openTicketId);if(!tk||tk.status==='closed')return;
+  if(tk.status==='open'){tk.status='taken';tk.assignee=S.login}
+  if(tk.assignee&&tk.assignee!==S.login){toast(t('Тикет у другого админа','Ticket with another admin'));return}
+  const text=document.getElementById('replyText').value.trim();if(!text)return;
+  if(!tk.thread)tk.thread=[];
+  tk.thread.push({from:'admin',login:S.login,text,at:Date.now()});
+  if(!tk.assignee){tk.assignee=S.login;tk.status='taken'}
+  render();
+};
+const reopenA=document.getElementById('reopenTicket');
+if(reopenA)reopenA.onclick=()=>{
+  const tk=S.tickets.find(x=>x.id===S.openTicketId);if(!tk)return;
+  tk.status='taken';tk.assignee=S.login;tk.closedAt=null;tk.rating=null;
+  if(!tk.thread)tk.thread=[];
+  tk.thread.push({from:'admin',login:S.login,text:t('Админ снова открыл обращение','Admin reopened the ticket'),at:Date.now()});
+  toast(t('Открыто снова','Reopened'));render();
+};
+document.querySelectorAll('[data-take]').forEach(b=>b.onclick=e=>{e.stopPropagation();const tk=S.tickets.find(x=>x.id===b.dataset.take);if(!tk||tk.status!=='open')return;tk.status='taken';tk.assignee=S.login;if(!tk.thread)tk.thread=[];tk.thread.push({from:'admin',login:S.login,text:t(`Здравствуйте! Это ${S.login}, я помогу вам решить данный вопрос.`,`Hello! This is ${S.login}, I will help.`),at:Date.now()});S.openTicketId=tk.id;render()});document.querySelectorAll('[data-close]').forEach(b=>b.onclick=e=>{e.stopPropagation();const tk=S.tickets.find(x=>x.id===b.dataset.close);if(tk){tk.status='closed';tk.closedAt=Date.now();if(!tk.thread)tk.thread=[];tk.thread.push({from:'admin',login:S.login,text:t('Обращение закрыто','Ticket closed'),at:Date.now()})}render()});document.querySelectorAll('[data-transfer]').forEach(b=>b.onclick=e=>{e.stopPropagation();const tk=S.tickets.find(x=>x.id===b.dataset.transfer);if(tk){tk.status='open';tk.assignee=null;if(!tk.thread)tk.thread=[];tk.thread.push({from:'admin',login:S.login,text:t('Передано другому админу','Transferred to another admin'),at:Date.now()})}S.openTicketId='';render()});document.querySelectorAll('[data-leave]').forEach(b=>b.onclick=e=>{e.stopPropagation();const tk=S.tickets.find(x=>x.id===b.dataset.leave);if(tk&&tk.assignee===S.login){tk.status='open';tk.assignee=null;if(!tk.thread)tk.thread=[];tk.thread.push({from:'admin',login:S.login,text:t('Админ вышел из обращения','Admin left the ticket'),at:Date.now()})}S.openTicketId='';render()});const evAddPass=document.getElementById('evAddPass');
+if(evAddPass)evAddPass.onclick=()=>{const d=syncEvDraftFromDom();d.passes.push({name:t('Новая','New'),price:0,color:'#a78bfa',levels:[{level:1,reward:{kind:'money',amount:10}}],tasks:[{text:t('Задание','Task'),kind:'gb',amount:1}]});S.evDraft=d;S.evPassTab=d.passes.length-1;render()};
+const evAddLvl=document.getElementById('evAddLvl');
+if(evAddLvl)evAddLvl.onclick=()=>{const d=syncEvDraftFromDom();const p=d.passes[S.evPassTab||0];if(!p)return;if(!p.levels)p.levels=[];p.levels.push({level:(p.levels.length||0)+1,reward:{kind:'money',amount:10}});S.evDraft=d;render()};
+const evAddTask=document.getElementById('evAddTask');
+if(evAddTask)evAddTask.onclick=()=>{const d=syncEvDraftFromDom();const p=d.passes[S.evPassTab||0];if(!p)return;if(!p.tasks)p.tasks=[];p.tasks.push({text:t('Новое задание','New task'),kind:'other',amount:1});S.evDraft=d;render()};
+document.querySelectorAll('[data-pass-del]').forEach(b=>b.onclick=()=>{const d=syncEvDraftFromDom();d.passes.splice(Number(b.dataset.passDel),1);S.evPassTab=Math.max(0,Math.min(S.evPassTab||0,d.passes.length-1));S.evDraft=d;render()});
+document.querySelectorAll('[data-lvl-del]').forEach(b=>b.onclick=()=>{const d=syncEvDraftFromDom();const p=d.passes[S.evPassTab||0];if(p&&p.levels)p.levels.splice(Number(b.dataset.lvlDel),1);S.evDraft=d;render()});
+document.querySelectorAll('[data-task-del]').forEach(b=>b.onclick=()=>{const d=syncEvDraftFromDom();const p=d.passes[S.evPassTab||0];if(p&&p.tasks)p.tasks.splice(Number(b.dataset.taskDel),1);S.evDraft=d;render()});
+// live-save draft fields
+['evName','evTheme','evStart','evEnd'].forEach(id=>{const el=document.getElementById(id);if(el)el.onchange=()=>syncEvDraftFromDom()});
+document.querySelectorAll('[data-pass-name],[data-pass-price],[data-pass-color],[data-lvl-n],[data-lvl-kind],[data-lvl-amount],[data-lvl-case],[data-task-text],[data-task-kind],[data-task-amount]').forEach(el=>{el.onchange=()=>syncEvDraftFromDom()});
+const ec=document.getElementById('evCreate');
+if(ec)ec.onclick=()=>{
+  const d=syncEvDraftFromDom();
+  const name=(d.name||'').trim();if(!name){toast(t('Укажите название','Enter name'));return}
+  if(!d.passes||!d.passes.length){toast(t('Добавьте подписку','Add a pass'));return}
+  const id=uid();
+  let start=d.start?new Date(d.start).getTime():Date.now();
+  let end=d.end?new Date(d.end).getTime():(Date.now()+7*DAY);
+  if(!Number.isFinite(start)) start=Date.now();
+  if(!Number.isFinite(end)) end=Date.now()+7*DAY;
+  if(end<=start){toast(t('Конец должен быть позже начала','End must be after start'));return}
+
+  S.events.unshift({
+    id,name,theme:d.theme||'default',start,end,
+    passes:d.passes.map((p,i)=>({id:id+'p'+i,name:p.name,price:Number(p.price)||0,color:p.color||'#93c5fd',levels:(p.levels||[]).map((l,j)=>({level:Number(l.level)||(j+1),reward:(()=>{const rw=(l.reward&&typeof l.reward==='object')?l.reward:{kind:'money',amount:10};const out={kind:rw.kind||'money',amount:rw.kind==='case'?(rw.caseId||rw.amount||''):Number(rw.amount)||0};if(rw.kind==='case')out.caseId=String(rw.caseId||rw.amount||'');return out})()})),tasks:(p.tasks||[]).map((tk,j)=>({id:id+'p'+i+'t'+j,text:tk.text,kind:tk.kind||'other',amount:Number(tk.amount)||0}))}))
+  });
+  S.evDraft=null;
+  toast(t('Ивент создан','Event created'));render();
+};
+document.querySelectorAll('[data-evdel]').forEach(b=>b.onclick=()=>{S.events=S.events.filter(e=>e.id!==b.dataset.evdel);render()})}
+function syncSelf(){S.people=S.people.map(p=>p.login===S.login?{...p,balance:S.balance,tariffId:S.tariffId,subEnd:S.subEnd,devices:S.devices,gb:S.gb,banned:S.banned,muted:S.muted}:p)}
+function chooseMode(m){
+  const now=Date.now(), dual=S.dualUntil>now;
+  if(dual){ S.mode=m; return null; }
+  // if never used other mode, allow switch freely until one is used
+  if(m==='wheel' && S.mode==='tap' && (S.tapsToday||0)>0 && S.modeLock>now){
+    return t('Сейчас режим тапа (24ч)','Tap mode active (24h)');
+  }
+  if(m==='tap' && S.mode==='wheel' && S.lastWheel && (now-S.lastWheel)<DAY && S.modeLock>now){
+    return t('Сейчас режим барабана (24ч)','Wheel mode active (24h)');
+  }
+  if(S.mode!==m){
+    S.mode=m;
+    // lock only after an actual play sets modeLock
+  }
+  return null;
+}
+
+function doSpin(){if((S.offGames||[]).includes('wheel')){toast(t('Временно недоступно','Temporarily unavailable'));return}if(S.banned){toast(t('Бан','Banned'));return}if(!active()){toast(t('Нужна активная подписка','Active plan required'));return}const err=chooseMode('wheel');if(err){toast(err);return}const free=S.freeSpins>0;if(!free&&Date.now()-S.lastWheel<DAY){toast(t('Уже крутили сегодня','Already spun today'));return}const pool=wheelPool(),prize=pick(pool),slice=360/pool.length,idx=pool.indexOf(prize);S.spinning=true;S.wheelDeg+=360*6+(360-idx*slice-slice/2);if(!free)S.lastWheel=Date.now();else S.freeSpins--;S.stats.spins++;if(prize.k!=='none')reward(prize.k,prize.v,prize.l);else S.rewards.unshift({id:uid(),name:t('Ничего','Nothing'),at:Date.now()});render();setTimeout(()=>{toast(prize.k==='none'?t('Ничего','Nothing'):prize.l);S.spinning=false},4100)}
+function doTap(){if((S.offGames||[]).includes('tap')){toast(t('Временно недоступно','Temporarily unavailable'));return}if(S.banned){toast(t('Бан','Banned'));return}if(!active()){toast(t('Нужна подписка','Need plan'));return}const err=chooseMode('tap');if(err){toast(err);return}if(!(S.dualUntil>Date.now())&&S.mode==='wheel'&&S.lastWheel>Date.now()-DAY){toast(t('Барабан уже крутили','Wheel already used'));return}const day=new Date().toDateString();if(S.tapDay!==Date.parse(day)){S.tapDay=Date.parse(day);S.tapsToday=0}if(S.tapsToday>=tapLimit()){toast(t('Тапы кончились','No taps left'));return}S.tapsToday++;S.stats.taps=(S.stats.taps||0)+1;S.mode='tap';S.modeLock=Date.now()+DAY;let label=t('Пусто','Nothing');if(Math.random()>0.92){const m=1+Math.floor(Math.random()*5);label=`+${m} ₽`;reward('money',m,label)}S.floatTap=label;blip(520);render()}
+function doSlot(){if(Date.now()-S.lastSlot<DAY){toast(t('Уже крутили сегодня','Already today'));return}const prize=pick(SLOT);S.lastSlot=Date.now();S.stats.slots++;reward('money',prize.v,prize.l);S.slotText=prize.l;const seq=['+1','+3','+5','+10','+50','+100'];let n=0;const timer=setInterval(()=>{const els=document.querySelectorAll('#reel div');els.forEach(el=>el.textContent=seq[Math.floor(Math.random()*seq.length)]);if(++n>12){clearInterval(timer);els.forEach(el=>el.textContent=prize.l)}},70);toast(prize.l);setTimeout(render,1000)}
+function startMines(){if(S.mines&&!S.minesDone&&Date.now()-S.lastMines<DAY){render();return}if(Date.now()-S.lastMines<DAY&&S.minesDone){toast(t('Уже играли сегодня','Already played'));return}const cells=Array.from({length:30},()=>({kind:'empty',open:false})),order=cells.map((_,i)=>i).sort(()=>Math.random()-.5);for(let i=0;i<4;i++)cells[order[i]]={kind:'bomb',open:false};const rewards=['+2 ₽','+3 ₽','1% скидка','+1 ₽','1% скидка','+5 ₽'];for(let i=0;i<rewards.length;i++)cells[order[4+i]]={kind:'reward',label:rewards[i],open:false};S.mines=cells;S.minesLives=3;S.minesDone=false;S.lastMines=Date.now();render()}
+function openCell(i){if(!S.mines||S.minesDone||S.minesLives<=0)return;const cell=S.mines[i];if(!cell||cell.open)return;cell.open=true;if(cell.kind==='bomb'){S.mines.forEach(c=>{if(c.kind==='bomb')c.open=true});S.minesLives=0;S.minesDone=true;S.stats.mines++;toast(t('Бомба','Bomb'));render();return}S.minesLives--;if(cell.kind==='reward'&&cell.label){if(cell.label.includes('%'))reward('discount',parseInt(cell.label,10)||1,cell.label);else reward('money',parseInt(cell.label.replace(/\D/g,''),10)||1,cell.label);toast(cell.label)}if(S.minesLives<=0){S.minesDone=true;S.stats.mines++}render()}
+function openCase(id){const box=CASES.find(c=>c.id===id);if(!box)return;const price=Math.max(1,Math.round(box.price*(1-S.discount/100)));if(S.balance<price){toast(t('Не хватает баланса','Not enough balance'));return}S.balance-=price;const drop=pick(box.drops);reward(drop.k,drop.v,drop.l);S.caseResult=drop.l;S.stats.cases++;S.stats.spent+=price;syncSelf();toast(drop.l);render()}
+function redeem(){const code=document.getElementById('promoCode').value.trim().toUpperCase(),promo=S.promos.find(p=>p.code===code);if(!promo){toast(t('Не найден','Not found'));return}if(promo.expires&&promo.expires<Date.now()){toast(t('Истёк','Expired'));return}if(promo.uses&&promo.used>=promo.uses){toast(t('Лимит','Limit'));return}if(S.promoHistory.some(h=>h.code===code)){toast(t('Уже активирован','Already used'));return}let effect='';if(promo.kind==='money'){S.balance+=promo.value;effect=`+${promo.value} ₽`}else if(promo.kind==='case'){const c=getCaseById(String(promo.value))||(S.customCases||[]).find(x=>x.id===String(promo.value));if(!c){toast(t('Кейс не найден','Case not found'));return}S.myCases=S.myCases||[];S.myCases.push({...c,gotAt:Date.now(),from:'promo'});effect=t('Кейс: ','Case: ')+(c.name||c.ru)}else if(promo.kind==='days'&&S.tariffId){S.subEnd=Math.max(Date.now(),S.subEnd)+promo.value*DAY;effect=`+${promo.value}d`}else if(promo.kind==='spins'){S.freeSpins+=promo.value;effect=`+${promo.value} spins`}else if(promo.kind==='dual'){S.dualUntil=Date.now()+promo.value*DAY;effect=t('Барабан+тап','Wheel+tap')}else if(promo.kind==='discount'){S.discount=Math.min(50,S.discount+promo.value);effect=`+${promo.value}%`}else{toast(t('Нужна подписка','Need plan'));return}promo.used++;S.promoHistory.unshift({code,at:Date.now(),effect});S.rewards=[{id:uid(),name:effect,kind:promo.kind,value:promo.value,at:Date.now(),applied:true},...(S.rewards||[])].slice(0,60);syncSelf();toast(effect);render()}
+render();
+
+</script>
+</body>
+</html>
